@@ -94,7 +94,7 @@ def copy_folder_contents(source_folder_id, destination_folder_id):
     copy_files_and_folders(source_folder_id, destination_folder_id)
     
     # Notify the user that the process has completed
-    print(f"All contents copied from {source_folder_id} to {destination_folder_id}.")
+    print(f"Congrats! All contents have been copied from {source_folder_id} to {destination_folder_id}.")
 
 if __name__ == "__main__":
     """
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     source_folder_id = '1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V'
     
     # Prompt the user for the destination folder ID
-    destination_folder_id = input("Please enter the destination folder ID: ")
+    destination_folder_id = input("Please enter the destination folder ID (hint:1TjN_VohuoM0MaIzYp-z16nVDLiVoWWW1): ")
     
     # Call the function to copy folder contents
     copy_folder_contents(source_folder_id, destination_folder_id)
