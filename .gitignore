@@ -8,3 +8,5 @@ __pycache__/
 
 # Ignore credentials
 credentials.json
+
+.DS_Store
