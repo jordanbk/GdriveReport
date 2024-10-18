@@ -9,12 +9,16 @@
 - Move the file to the root directory of this project.
 - Visit [Google API page](https://console.developers.google.com/apis/library)
 - Search for "Google Drive API" and enable it if it is disabled
-- Run the following commands:
+
+### Clone repo and run reports
+- Clone this repo
+- Change directory to root file
+- Run commands:
 
 ```sh
 $ pip3 install -U pip
 $ pip3 install -U -r requirements.txt
-$ python3 nf_gdrive/gdrive/src/assessment_1.py
-$ python3 nf_gdrive/gdrive/src/assessment_2.py
-$ python3 nf_gdrive/gdrive/src/assessment_3.py
+$ python3 reports/src/assessment_1.py
+$ python3 reports/src/assessment_2.py
+$ python3 reports/src/assessment_3.py
 ```
