@@ -6,7 +6,7 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 # The scope we require for accessing Google Drive metadata
-SCOPES = ["https://www.googleapis.com/auth/drive.metadata.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/drive"]
 
 def authenticate_gdrive():
     """
