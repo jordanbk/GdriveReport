@@ -8,7 +8,7 @@
 - Use the download button to download your credentials.
 - Move the file to the root directory of this project.
 - Visit [Google API page](https://console.developers.google.com/apis/library)
-- Search for Drive and enable it if it is disabled
+- Search for Google Drive and enable it if it is disabled
 - Run the following commands:
 
 ```sh
