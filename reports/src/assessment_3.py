@@ -1,5 +1,29 @@
 from auth import authenticate_gdrive
 
+def count_total_items(service, folder_id):
+    """
+    Recursively count all files and subfolders in a Google Drive folder.
+    
+    Args:
+        service: The authenticated Google Drive API service.
+        folder_id: The ID of the folder to count items in.
+    
+    Returns:
+        The total number of items (files and folders) in the folder and its subfolders.
+    """
+    query = f"'{folder_id}' in parents and trashed=false"
+    response = service.files().list(q=query, fields="files(id, mimeType)").execute()
+    
+    total_items = 0
+    files = response.get('files', [])
+    
+    for file in files:
+        total_items += 1
+        if file['mimeType'] == 'application/vnd.google-apps.folder':
+            total_items += count_total_items(service, file['id'])  # Recursively count subfolder items
+    
+    return total_items
+
 def copy_folder_contents(source_folder_id, destination_folder_id):
     """
     Copies all contents (files and subfolders) from the source Google Drive folder 
@@ -11,6 +35,11 @@ def copy_folder_contents(source_folder_id, destination_folder_id):
     """
     # Authenticate and get access to the Google Drive API
     service = authenticate_gdrive()
+
+    # Step 1: Count total items to copy
+    print("Counting total items to copy...")
+    total_items = count_total_items(service, source_folder_id)
+    print(f"Total items to copy: {total_items}")
 
     # Initialize total count for progress tracking
     total_items_copied = 0
@@ -33,40 +62,32 @@ def copy_folder_contents(source_folder_id, destination_folder_id):
         # Retrieve the list of files (and folders) from the API response
         files = response.get('files', [])
         
-        # Track total number of items to copy
-        total_files = len(files)
-        current_item = 1
-        
         # Loop through each file and folder found in the source folder
         for file in files:
             copied_file = None
 
             # If the current file is a folder, recursively copy its contents
             if file['mimeType'] == 'application/vnd.google-apps.folder':
-                # Metadata for the folder to be created in the destination
                 folder_metadata = {
-                    'name': file['name'],  # Keep the folder name the same
-                    'mimeType': 'application/vnd.google-apps.folder',  # Type as folder
-                    'parents': [dest_id]  # Set the destination folder as its parent
+                    'name': file['name'],
+                    'mimeType': 'application/vnd.google-apps.folder',
+                    'parents': [dest_id]
                 }
-                # Create the folder in the destination
                 copied_file = service.files().create(body=folder_metadata, fields='id').execute()
-                print(f"[{current_item}/{total_files}] Folder copied: {file['name']}")
-                # Recursively copy the contents of this subfolder
-                copy_files_and_folders(file['id'], copied_file['id'])
+                print(f"Folder copied: {file['name']}")
+                copy_files_and_folders(file['id'], copied_file['id'])  # Recursively copy subfolder
             else:
                 # If the file is not a folder, copy it to the destination
                 file_metadata = {
-                    'name': file['name'],  # Keep the file name the same
-                    'parents': [dest_id]  # Set the destination folder as its parent
+                    'name': file['name'],
+                    'parents': [dest_id]
                 }
-                # Copy the file to the destination folder
                 copied_file = service.files().copy(fileId=file['id'], body=file_metadata).execute()
-                print(f"[{current_item}/{total_files}] File copied: {file['name']}")
+                print(f"File copied: {file['name']}")
 
-            # Increment the progress counter
+            # Increment the progress counter and display progress
             total_items_copied += 1
-            current_item += 1
+            print(f"Progress: {total_items_copied}/{total_items} items copied.")
 
     # Start copying the contents of the source folder to the destination
     print(f"Starting to copy contents from {source_folder_id} to {destination_folder_id}...")
@@ -123,21 +144,9 @@ def compare_folders(service, folder_id1, folder_id2):
             if not compare_folders(service, file1['id'], file2['id']):
                 return False
 
-        # Skip size comparison for Google Docs, Sheets, Slides, etc.
-        if "google-apps" in file1['mimeType']:
-            continue  # Skip comparing size and modifiedTime for Google native files
-
-        # Optionally compare file metadata such as size and modifiedTime
-        elif file1.get('size') != file2.get('size'):
-            print(f"Size mismatch: {file1['name']} has different sizes")
-            return False
-        elif file1.get('modifiedTime') != file2.get('modifiedTime'):
-            print(f"Modified time mismatch: {file1['name']} has different modification times")
-            return False
 
     # If all checks passed, the folders are equal
     return True
-
 
 def get_folder_contents(service, folder_id):
     """
