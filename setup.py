@@ -1,10 +1,10 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='my_project',
+    name='reports',
     version='0.1',
-    packages=find_packages(where='my_project/src'),  # This points to the correct 'src' folder
-    package_dir={'': 'my_project/src'},  # This indicates that packages are in 'my_project/src'
+    packages=find_packages(where='reports/src'),  # This points to the correct 'src' folder
+    package_dir={'': 'reports/src'},  # This indicates that packages are in 'my_project/src'
     install_requires=[
         'google-api-python-client',
         'google-auth',

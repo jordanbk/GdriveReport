@@ -74,7 +74,7 @@ def copy_folder_contents(source_folder_id, destination_folder_id):
                     'parents': [dest_id]
                 }
                 copied_file = service.files().create(body=folder_metadata, fields='id').execute()
-                print(f"Folder copied: {file['name']}")
+                # print(f"Folder copied: {file['name']}")
                 copy_files_and_folders(file['id'], copied_file['id'])  # Recursively copy subfolder
             else:
                 # If the file is not a folder, copy it to the destination
@@ -83,7 +83,7 @@ def copy_folder_contents(source_folder_id, destination_folder_id):
                     'parents': [dest_id]
                 }
                 copied_file = service.files().copy(fileId=file['id'], body=file_metadata).execute()
-                print(f"File copied: {file['name']}")
+                # print(f"File copied: {file['name']}")
 
             # Increment the progress counter and display progress
             total_items_copied += 1
@@ -96,7 +96,7 @@ def copy_folder_contents(source_folder_id, destination_folder_id):
     # Notify the user that the process has completed
     print(f"Congrats! {total_items_copied} items have been copied from {source_folder_id} to {destination_folder_id}.")
 
-    print(f"Running test to ensure {source_folder_id} equals {destination_folder_id}.")
+    print(f"Running test to ensure source folder: {source_folder_id} equals destination folder: {destination_folder_id}...")
 
     # After copying, compare the two folders to check if they are identical
     if compare_folders(service, source_folder_id, destination_folder_id):
