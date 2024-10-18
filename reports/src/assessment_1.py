@@ -11,6 +11,6 @@ def count_files(source_folder_id):
     print(f"Total folders: {folder_count}")
 
 if __name__ == "__main__":
-    # source_folder_id = '1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V' #netflix source folder id
-    source_folder_id = '1n1bWgY26PZWXJnA3G5qfaD96kCupuUAK'
+    # source_folder_id = '1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V'
+    source_folder_id = '1n1bWgY26PZWXJnA3G5qfaD96kCupuUAK' #personal folder id
     count_files(source_folder_id)
