@@ -31,4 +31,38 @@ def count_recursive(source_folder_id):
         # Track the total number of nested folders
         nested_folder_count = folder_count
 
-        # Query to list all non-trashed
+        # Query to list all non-trashed files and folders inside the current folder
+        query = f"'{folder_id}' in parents and trashed=false"
+        response = service.files().list(q=query, fields="files(id, mimeType, name)").execute()
+
+        # Get the list of files and folders
+        files = response.get('files', [])
+
+        # Filter out only the subfolders from the list
+        subfolders = [f for f in files if f['mimeType'] == 'application/vnd.google-apps.folder']
+
+        # Recursively count files and folders inside each subfolder
+        for folder in subfolders:
+            sub_file_count, sub_folder_count = count_children(folder['id'])
+            # Add the counts from the subfolder to the parent folder's totals
+            file_count += sub_file_count
+            nested_folder_count += sub_folder_count
+
+        return file_count, nested_folder_count
+
+    # Get the total number of files and nested folders for the source folder
+    total_files, total_folders = count_children(source_folder_id)
+    
+    # Output the results
+    print(f"Total number of child objects (recursively): {total_files}")
+    print(f"Total number of nested folders: {total_folders}")
+
+if __name__ == "__main__":
+    """
+    Main execution block: Calls the function to generate the report for the specified source folder.
+    """
+    # Define the source folder ID (hardcoded for this example)
+    source_folder_id = '1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V'  # Replace with your folder ID
+
+    # Generate the recursive count report
+    count_recursive(source_folder_id)
