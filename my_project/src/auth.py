@@ -9,6 +9,7 @@ SCOPES = ["https://www.googleapis.com/auth/drive.metadata.readonly"]
 
 def authenticate_gdrive():
     """Authenticates the user to Google Drive API and returns a service instance."""
+    """https://developers.google.com/drive/api/quickstart/python"""
     creds = None
     token_file = "token.json"
     
@@ -22,7 +23,7 @@ def authenticate_gdrive():
             creds.refresh(Request())
         else:
             flow = InstalledAppFlow.from_client_secrets_file(
-                "my_project/credentials.json", SCOPES
+                "credentials.json", SCOPES
             )
             creds = flow.run_local_server(port=0)
         
