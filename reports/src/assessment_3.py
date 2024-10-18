@@ -12,20 +12,30 @@ def copy_folder_contents(source_folder_id, destination_folder_id):
     # Authenticate and get access to the Google Drive API
     service = authenticate_gdrive()
 
+    # Initialize total count for progress tracking
+    total_items_copied = 0
+
     def copy_files_and_folders(source_id, dest_id):
         """
-        Recursively copy all files and folders from the source folder to the destination folder.
+        Recursively copy all files and folders from the source folder to the destination folder,
+        providing progress feedback to the user.
         
         Args:
             source_id (str): The ID of the current folder being copied.
             dest_id (str): The ID of the destination folder where contents will be copied.
         """
+        nonlocal total_items_copied
+
         # Build the query to get all non-trashed files and folders in the source folder
         query = f"'{source_id}' in parents and trashed=false"
         response = service.files().list(q=query, fields="files(id, name, mimeType)").execute()
         
         # Retrieve the list of files (and folders) from the API response
         files = response.get('files', [])
+        
+        # Track total number of items to copy
+        total_files = len(files)
+        current_item = 1
         
         # Loop through each file and folder found in the source folder
         for file in files:
@@ -41,6 +51,7 @@ def copy_folder_contents(source_folder_id, destination_folder_id):
                 }
                 # Create the folder in the destination
                 copied_file = service.files().create(body=folder_metadata, fields='id').execute()
+                print(f"[{current_item}/{total_files}] Folder copied: {file['name']}")
                 # Recursively copy the contents of this subfolder
                 copy_files_and_folders(file['id'], copied_file['id'])
             else:
@@ -51,12 +62,18 @@ def copy_folder_contents(source_folder_id, destination_folder_id):
                 }
                 # Copy the file to the destination folder
                 copied_file = service.files().copy(fileId=file['id'], body=file_metadata).execute()
+                print(f"[{current_item}/{total_files}] File copied: {file['name']}")
+
+            # Increment the progress counter
+            total_items_copied += 1
+            current_item += 1
 
     # Start copying the contents of the source folder to the destination
+    print(f"Starting to copy contents from {source_folder_id} to {destination_folder_id}...")
     copy_files_and_folders(source_folder_id, destination_folder_id)
     
     # Notify the user that the process has completed
-    print(f"Congrats! All contents have been copied from {source_folder_id} to {destination_folder_id}.")
+    print(f"Congrats! {total_items_copied} items have been copied from {source_folder_id} to {destination_folder_id}.")
 
 if __name__ == "__main__":
     """
@@ -67,7 +84,7 @@ if __name__ == "__main__":
     source_folder_id = '1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V'
     
     # Prompt the user for the destination folder ID
-    destination_folder_id = input("Please enter the destination folder ID (hint:1TjN_VohuoM0MaIzYp-z16nVDLiVoWWW1): ")
+    destination_folder_id = input("Please enter the destination folder ID (hint: 1TjN_VohuoM0MaIzYp-z16nVDLiVoWWW1): ")
     
     # Call the function to copy folder contents
     copy_folder_contents(source_folder_id, destination_folder_id)
