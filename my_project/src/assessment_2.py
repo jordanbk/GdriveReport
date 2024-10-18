@@ -14,7 +14,7 @@ def count_recursive(source_folder_id):
         file_count, folder_count = count_files_and_folders(service, folder_id)
 
         nested_folder_count = folder_count
-        
+
         # List all files and folders inside the current folder
         query = f"'{folder_id}' in parents and trashed=false"
         response = service.files().list(q=query, fields="files(id, mimeType, name)").execute()
