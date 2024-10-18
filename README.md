@@ -1,6 +1,6 @@
 # gdrive
 
-##### Getting Google OAuth API credential file
+##### Retrieve Google OAuth API credential file
 - Visit the [Google Cloud Console](https://console.developers.google.com/apis/credentials)
 - Navigate to the OAuth Consent Screen tab, complete the necessary fields, save.
 - In the Credentials tab, click on Create Credentials and select OAuth Client ID.
@@ -14,7 +14,7 @@
 ```sh
 $ pip3 install -U pip
 $ pip3 install -U -r requirements.txt
-$ python3 gdrive/my_project/src/assessment_1.py
-$ python3 gdrive/my_project/src/assessment_2.py
-$ python3 gdrive/my_project/src/assessment_3.py
+$ python3 nf_gdrive/gdrive/src/assessment_1.py
+$ python3 nf_gdrive/gdrive/src/assessment_2.py
+$ python3 nf_gdrive/gdrive/src/assessment_3.py
 ```
