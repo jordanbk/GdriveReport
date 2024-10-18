@@ -13,6 +13,6 @@ def count_files_and_folders(source_folder_id):
     print(f"Total files: {file_count}")
     print(f"Total folders: {folder_count}")
 
-if __name__ == "__main__":
-    source_folder_id = '1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V'
-    count_files_and_folders(source_folder_id)
+# if __name__ == "__main__":
+#     source_folder_id = '1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V'
+#     count_files_and_folders(source_folder_id)
