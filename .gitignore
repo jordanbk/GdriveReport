@@ -6,7 +6,8 @@ __pycache__/
 *.pyc
 *.pyo
 
-# Ignore credentials
+# Ignore personal credentials
 credentials.json
 
+# Ignore macOS system files
 .DS_Store
