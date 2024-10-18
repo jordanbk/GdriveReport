@@ -29,6 +29,6 @@ def count_files_and_folders(service, folder_id):
     
     # Count the number of folders
     folder_count = sum(1 for file in files if file['mimeType'] == 'application/vnd.google-apps.folder')
-    print(type(file_count))
+
     # Return the counts as a tuple: (number of files, number of folders)
     return file_count, folder_count
