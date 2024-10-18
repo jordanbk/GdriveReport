@@ -75,6 +75,85 @@ def copy_folder_contents(source_folder_id, destination_folder_id):
     # Notify the user that the process has completed
     print(f"Congrats! {total_items_copied} items have been copied from {source_folder_id} to {destination_folder_id}.")
 
+    print(f"Running test to ensure {source_folder_id} equals {destination_folder_id}.")
+
+    # After copying, compare the two folders to check if they are identical
+    if compare_folders(service, source_folder_id, destination_folder_id):
+        print("The folders are identical after copying.")
+    else:
+        print("The folders are not identical after copying.")
+
+def compare_folders(service, folder_id1, folder_id2):
+    """
+    Compare two folders in Google Drive to check if they have the same files and folders.
+    
+    Args:
+        service: The authenticated Google Drive API service.
+        folder_id1: The ID of the first folder to compare.
+        folder_id2: The ID of the second folder to compare.
+    
+    Returns:
+        True if the folders are equal, False otherwise.
+    """
+    
+    # Retrieve contents of both folders
+    folder1_contents = get_folder_contents(service, folder_id1)
+    folder2_contents = get_folder_contents(service, folder_id2)
+    
+    # Sort both lists of files by name (to ensure order-independent comparison)
+    folder1_contents.sort(key=lambda x: x['name'])
+    folder2_contents.sort(key=lambda x: x['name'])
+    
+    # Compare the number of files/folders in each folder
+    if len(folder1_contents) != len(folder2_contents):
+        print(f"Folder content mismatch: {len(folder1_contents)} items in folder 1, {len(folder2_contents)} items in folder 2")
+        return False
+    
+    # Compare each file and folder in both lists
+    for file1, file2 in zip(folder1_contents, folder2_contents):
+        if file1['name'] != file2['name']:
+            print(f"Name mismatch: {file1['name']} in folder 1, {file2['name']} in folder 2")
+            return False
+        if file1['mimeType'] != file2['mimeType']:
+            print(f"Type mismatch: {file1['mimeType']} for {file1['name']} in folder 1, {file2['mimeType']} in folder 2")
+            return False
+
+        # If they are subfolders, recursively compare their contents
+        if file1['mimeType'] == 'application/vnd.google-apps.folder':
+            if not compare_folders(service, file1['id'], file2['id']):
+                return False
+
+        # Skip size comparison for Google Docs, Sheets, Slides, etc.
+        if "google-apps" in file1['mimeType']:
+            continue  # Skip comparing size and modifiedTime for Google native files
+
+        # Optionally compare file metadata such as size and modifiedTime
+        elif file1.get('size') != file2.get('size'):
+            print(f"Size mismatch: {file1['name']} has different sizes")
+            return False
+        elif file1.get('modifiedTime') != file2.get('modifiedTime'):
+            print(f"Modified time mismatch: {file1['name']} has different modification times")
+            return False
+
+    # If all checks passed, the folders are equal
+    return True
+
+
+def get_folder_contents(service, folder_id):
+    """
+    Retrieve all non-trashed files and folders in a folder, including subfolders.
+    
+    Args:
+        service: The Google Drive API service instance.
+        folder_id: The ID of the folder to retrieve contents from.
+    
+    Returns:
+        A list of dictionaries containing file metadata (id, name, mimeType).
+    """
+    query = f"'{folder_id}' in parents and trashed=false"
+    response = service.files().list(q=query, fields="files(id, name, mimeType, size, modifiedTime)").execute()
+    return response.get('files', [])
+
 if __name__ == "__main__":
     """
     Main execution block: Prompts the user for the destination folder ID and calls
