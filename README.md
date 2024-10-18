@@ -14,7 +14,7 @@
 - Clone repo
 ```git clone https://github.com/jordanbk/GdriveReport.git```
 - Change directory to root file
-```cd gdrivereport```
+```cd GdriveReport```
 - Run commands:
 
 ```
