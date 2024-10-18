@@ -11,11 +11,13 @@
 - Search for "Google Drive API" and enable it if it is disabled
 
 ### Clone repo and run reports
-- Clone this repo
+- Clone repo
+```git clone https://github.com/jordanbk/GdriveReport.git```
 - Change directory to root file
+```cd gdrivereport```
 - Run commands:
 
-```sh
+```
 $ pip3 install -U pip
 $ pip3 install -U -r requirements.txt
 $ python3 reports/src/assessment_1.py
