@@ -1,5 +1,5 @@
-from auth import authenticate_gdrive
-from utils import count_files_and_folders
+from gdrive.auth import authenticate_gdrive
+from gdrive.utils import count_files_and_folders
 
 def count_files(source_folder_id):
     """
