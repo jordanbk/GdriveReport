@@ -25,7 +25,6 @@ def test_count_files(mock_count_files_and_folders, mock_authenticate_gdrive, cap
     # Check that count_files_and_folders was called with the mock service and correct folder ID
     mock_count_files_and_folders.assert_called_once_with(mock_service, source_folder_id)
 
-    # Verify the mocked print outputs (if you want to check the actual printed result)
     # Capture printed output with capsys
     captured = capsys.readouterr()
     assert "Total files: 10" in captured.out
