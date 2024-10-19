@@ -19,7 +19,7 @@
 - Install dependencies and set up the project:
 ```
 pip3 install -U pip
-pip3 install -e .
+pip3 install .
 ```
 - Run the program:
 ```python3 main.py```
