@@ -3,6 +3,7 @@ from googleapiclient.discovery import Resource
 from gdrive.auth import authenticate_gdrive
 from gdrive.utils import count_files_and_folders
 
+
 def count_recursive(source_folder_id: str) -> None:
     """
     Generates a report that recursively counts the total number of child objects (files and folders)
@@ -19,7 +20,9 @@ def count_recursive(source_folder_id: str) -> None:
         print("Error: Could not authenticate with Google Drive API.")
         return
 
-    def count_children(folder_id: str, folder_name: str, level: int = 0) -> Tuple[int, int]:
+    def count_children(
+        folder_id: str, folder_name: str, level: int = 0
+    ) -> Tuple[int, int]:
         """
         Recursively count all files and folders in a given folder, including any nested subfolders.
         Prints a tree structure for visualization.
@@ -79,12 +82,20 @@ def count_recursive(source_folder_id: str) -> None:
 
     # Get the total number of files and nested folders for the source folder
     response = service.files().get(fileId=source_folder_id, fields="name").execute()
-    root_folder_name = response.get('name', 'Root Folder')  # Fallback to "Root Folder" if name not found
+    root_folder_name = response.get(
+        "name", "Root Folder"
+    )  # Fallback to "Root Folder" if name not found
     total_files, total_folders = count_children(source_folder_id, root_folder_name)
 
     # Output the results
-    print(f"\nTotal number of child objects (recursively) for each top-level folder: {total_files}")
-    print(f"Total number of nested folders for the source folder: {total_folders}")
+    print(
+        f"\nTotal number of child objects (recursively) across all top-level folders: {total_files}"
+    )
+    print(f"Total number of nested folders within the source folder: {total_folders}")
+    print(
+        f"Total items (files + folders, excluding root folder): {total_files + total_folders}"
+    )
+
 
 if __name__ == "__main__":
     """
@@ -92,7 +103,7 @@ if __name__ == "__main__":
     """
     # Define the source folder ID (hardcoded for this example)
     source_folder_id = (
-        "1n1bWgY26PZWXJnA3G5qfaD96kCupuUAK"  # Replace with your folder ID
+        "1n1bWgY26PZWXJnA3G5qfaD96kCupuUAK"  # Replace with your foldear ID
     )
 
     # Generate the recursive count report
