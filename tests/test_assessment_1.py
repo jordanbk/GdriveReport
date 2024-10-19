@@ -2,9 +2,14 @@ import pytest
 from unittest.mock import patch, Mock
 from reports.assessment_1 import count_files
 
-@patch('reports.assessment_1.authenticate_gdrive')
-@patch('reports.assessment_1.count_files_and_folders')
-def test_count_files(mock_count_files_and_folders, mock_authenticate_gdrive, capsys: pytest.CaptureFixture[str]):
+
+@patch("reports.assessment_1.authenticate_gdrive")
+@patch("reports.assessment_1.count_files_and_folders")
+def test_count_files(
+    mock_count_files_and_folders,
+    mock_authenticate_gdrive,
+    capsys: pytest.CaptureFixture[str],
+):
     """
     Test the count_files function in assessment_1.py.
     """
@@ -16,7 +21,7 @@ def test_count_files(mock_count_files_and_folders, mock_authenticate_gdrive, cap
     mock_count_files_and_folders.return_value = (10, 5)  # 10 files, 5 folders
 
     # Call the function to test (this would normally print output)
-    source_folder_id = '123456'  # Use a mock folder ID for testing purposes
+    source_folder_id = "123456"  # Use a mock folder ID for testing purposes
     count_files(source_folder_id)
 
     # Check that the authenticate_gdrive function was called once

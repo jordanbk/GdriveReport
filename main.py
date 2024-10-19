@@ -43,7 +43,6 @@ def get_source_folder_id():
     """
     return input("Please enter the source Google Drive folder ID to copy contents from (hint: 1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V): ")
 
-
 def get_destination_folder_id():
     """
     Prompts the user to enter a destination Google Drive folder ID to copy contents to.
