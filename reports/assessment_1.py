@@ -24,7 +24,7 @@ if __name__ == "__main__":
     Main execution block: Calls the function to generate the report for the specified source folder.
     """
     # Define the source folder ID (hardcoded for this example)
-    source_folder_id = '1n1bWgY26PZWXJnA3G5qfaD96kCupuUAK'  # Replace with your folder ID
+    source_folder_id = '1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V'  # Replace with your folder ID
 
     # Generate the file and folder count report for the source folder
     count_files(source_folder_id)
