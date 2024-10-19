@@ -33,6 +33,15 @@ def get_folder_id():
     """
     return input("Please enter the Google Drive folder ID (hint: 1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V): ")
 
+def get_destination_folder_id():
+    """
+    Prompts the user to enter a destination Google Drive folder ID.
+    
+    Returns:
+        str: The entered folder ID.
+    """
+    return input("Please enter the Google Drive folder ID to copy contents to (hint: 1TjN_VohuoM0MaIzYp-z16nVDLiVoWWW1): ")
+
 def main():
     """
     Main function that interacts with the user to select an assessment and run it.
@@ -47,19 +56,24 @@ def main():
             print("Exiting the tool. Thank you!")
             break
 
-        # Get the folder ID
-        folder_id = get_folder_id()
-
         # Execute the corresponding assessment based on the user's choice
         if assessment_number == 1:
+            # Get the source folder ID
+            folder_id = get_folder_id()
             print("Running Assessment 1...")
             assessment_1.count_files(folder_id)
         elif assessment_number == 2:
+            # Get the source folder ID
+            folder_id = get_folder_id()
             print("Running Assessment 2...")
             assessment_2.count_recursive(folder_id)
         elif assessment_number == 3:
+            # Get the source folder ID
+            folder_id = get_folder_id()
+            # Get the destination folder ID
+            destination_folder_id = get_destination_folder_id()
             print("Running Assessment 3...")
-            assessment_3.copy_folder_contents(folder_id)
+            assessment_3.copy_folder_contents(folder_id, destination_folder_id)
 
         # After the assessment finishes, ask the user if they want to run another assessment
         print("\nAssessment complete.")
