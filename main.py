@@ -9,10 +9,10 @@ def get_assessment_choice():
     """
     print("Welcome to the Google Drive Reporting Tool!")
     print("Please choose which assessment to run:")
-    print("1. Assessment 1: Count files and folders at the root level")
-    print("2. Assessment 2: Recursively count all files and folders")
-    print("3. Assessment 3: Analyze folder data")
-    print("4. Exit")
+    print("(1) Assessment 1: Count files and folders at the root level")
+    print("(2) Assessment 2: Recursively count all files and folders")
+    print("(3) Assessment 3: Copy folder contents from source folder to destination folder")
+    print("(4) Exit")
 
     while True:
         try:
@@ -33,9 +33,19 @@ def get_folder_id():
     """
     return input("Please enter the Google Drive folder ID (hint: 1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V): ")
 
+def get_source_folder_id():
+    """
+    Prompts the user to enter a source Google Drive folder ID to copy contents from.
+    
+    Returns:
+        str: The entered folder ID.
+    """
+    return input("Please enter the source Google Drive folder ID to copy contents from (hint: 1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V): ")
+
+
 def get_destination_folder_id():
     """
-    Prompts the user to enter a destination Google Drive folder ID.
+    Prompts the user to enter a destination Google Drive folder ID to copy contents to.
     
     Returns:
         str: The entered folder ID.
@@ -69,17 +79,17 @@ def main():
             assessment_2.count_recursive(folder_id)
         elif assessment_number == 3:
             # Get the source folder ID
-            folder_id = get_folder_id()
+            folder_id = get_source_folder_id()
             # Get the destination folder ID
             destination_folder_id = get_destination_folder_id()
             print("Running Assessment 3...")
             assessment_3.copy_folder_contents(folder_id, destination_folder_id)
 
         # After the assessment finishes, ask the user if they want to run another assessment
-        print("\nAssessment complete.")
+        print("\nReport complete.")
         another = input("Would you like to run another assessment? (yes/no): ").lower()
         if another != 'yes':
-            print("Exiting the tool. Thank you!")
+            print("Exiting the tool. Thank you and good bye!")
             break
 
 if __name__ == "__main__":
