@@ -1,4 +1,4 @@
-from auth import authenticate_gdrive
+from gdrive.auth import authenticate_gdrive
 
 def count_total_items(service, folder_id):
     """
