@@ -12,6 +12,7 @@ def get_assessment_choice():
     print("(1) Assessment 1: Count files and folders at the root level")
     print("(2) Assessment 2: Recursively count all files and folders")
     print("(3) Assessment 3: Copy folder contents from source folder to destination folder")
+    print("")
     print("(4) Exit")
 
     while True:
@@ -63,7 +64,7 @@ def main():
 
         # If the user chooses to exit, break the loop
         if assessment_number == 4:
-            print("Exiting the tool. Thank you!")
+            print("Exiting the tool. Thank you!👋")
             break
 
         # Execute the corresponding assessment based on the user's choice
@@ -89,7 +90,7 @@ def main():
         print("\nReport complete.")
         another = input("Would you like to run another assessment? (yes/no): ").lower()
         if another != 'yes':
-            print("Exiting the tool. Thank you and good bye!")
+            print("Exiting the tool. Thank you and good bye! 👋")
             break
 
 if __name__ == "__main__":
