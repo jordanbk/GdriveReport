@@ -5,7 +5,9 @@ env/
 __pycache__/
 *.pyc
 *.pyo
-*.vscode
+
+# Ignore VSCode settings folder
+.vscode/
 
 # Ignore personal credentials
 credentials.json
@@ -14,4 +16,5 @@ token.json
 # Ignore macOS system files
 .DS_Store
 
-*.pytest_cache
+# Ignore pytest cache
+.pytest_cache/
