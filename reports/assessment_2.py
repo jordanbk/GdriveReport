@@ -73,12 +73,13 @@ def count_recursive(source_folder_id):
         return file_count, nested_folder_count
 
     # Get the total number of files and nested folders for the source folder
-    total_files, total_folders = count_children(source_folder_id, "Root Folder")
+    response = service.files().get(fileId=source_folder_id, fields="name").execute()
+    root_folder_name = response.get('name', 'Root Folder')  # Fallback to "Root Folder" if name not found
+    total_files, total_folders = count_children(source_folder_id, root_folder_name)
 
     # Output the results
-    print(f"\nTotal number of child objects (recursively): {total_files}")
-    print(f"Total number of nested folders: {total_folders}")
-
+    print(f"\nTotal number of child objects (recursively) for each top-level folder: {total_files}")
+    print(f"Total number of nested folders for the source folder: {total_folders}")
 
 if __name__ == "__main__":
     """
@@ -86,7 +87,7 @@ if __name__ == "__main__":
     """
     # Define the source folder ID (hardcoded for this example)
     source_folder_id = (
-        "1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V"  # Replace with your folder ID
+        "1n1bWgY26PZWXJnA3G5qfaD96kCupuUAK"  # Replace with your folder ID
     )
 
     # Generate the recursive count report
