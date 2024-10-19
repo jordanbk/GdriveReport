@@ -24,3 +24,5 @@ $ pip3 install -e .
 ```
 - Run the program:
 ```$ gdrive_report```
+
+- Follow the prompts displayed by the program.
