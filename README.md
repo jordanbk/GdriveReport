@@ -15,7 +15,7 @@
 - Change directory to the root of the project:
 ```cd GdriveReport```
 - Move the credentials file to cwd:
-```mv /path/to/credentials.json .```
+```mv /path/to/client_secret* credentials.json```
 - Install dependencies and set up the project:
 ```
 pip3 install -U pip
