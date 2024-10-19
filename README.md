@@ -10,7 +10,7 @@
 - Visit [Google API page](https://console.developers.google.com/apis/library)
 - Search for "Google Drive API" and enable it if it is disabled
 
-### Clone repo and run reports
+#### Clone Repo and Run Reports
 - Clone the repo:
 ```git clone https://github.com/jordanbk/GdriveReport.git```
 - Change directory to the root of the project:
@@ -19,10 +19,10 @@
 ```mv /path/to/credentials.json .```
 - Install dependencies and set up the project:
 ```
-$ pip3 install -U pip
-$ pip3 install -e .
+pip3 install -U pip
+pip3 install -e .
 ```
 - Run the program:
-```$ gdrive_report```
+```gdrive_report```
 
 - Follow the prompts displayed by the program.
