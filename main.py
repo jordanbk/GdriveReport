@@ -1,9 +1,10 @@
 from reports import assessment_1, assessment_2, assessment_3
 
+
 def get_assessment_choice():
     """
     Prompts the user to select which assessment to run.
-    
+
     Returns:
         int: The chosen assessment number.
     """
@@ -11,7 +12,9 @@ def get_assessment_choice():
     print("Please choose which assessment to run:")
     print("(1) Assessment 1: Count files and folders at the root level")
     print("(2) Assessment 2: Recursively count all files and folders")
-    print("(3) Assessment 3: Copy folder contents from source folder to destination folder")
+    print(
+        "(3) Assessment 3: Copy folder contents from source folder to destination folder"
+    )
     print("")
     print("(4) Exit")
 
@@ -25,32 +28,42 @@ def get_assessment_choice():
         except ValueError:
             print("Invalid input. Please enter a number.")
 
+
 def get_folder_id():
     """
     Prompts the user to enter a Google Drive folder ID.
-    
+
     Returns:
         str: The entered folder ID.
     """
-    return input("Please enter the Google Drive folder ID (hint: 1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V): ")
+    return input(
+        "Please enter the Google Drive folder ID (hint: 1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V): "
+    )
+
 
 def get_source_folder_id():
     """
     Prompts the user to enter a source Google Drive folder ID to copy contents from.
-    
+
     Returns:
         str: The entered folder ID.
     """
-    return input("Please enter the source Google Drive folder ID to copy contents from (hint: 1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V): ")
+    return input(
+        "Please enter the source Google Drive folder ID to copy contents from (hint: 1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V): "
+    )
+
 
 def get_destination_folder_id():
     """
     Prompts the user to enter a destination Google Drive folder ID to copy contents to.
-    
+
     Returns:
         str: The entered folder ID.
     """
-    return input("Please enter the Google Drive folder ID to copy contents to (hint: 1TjN_VohuoM0MaIzYp-z16nVDLiVoWWW1): ")
+    return input(
+        "Please enter the Google Drive folder ID to copy contents to (hint: 1TjN_VohuoM0MaIzYp-z16nVDLiVoWWW1): "
+    )
+
 
 def main():
     """
@@ -88,9 +101,10 @@ def main():
         # After the assessment finishes, ask the user if they want to run another assessment
         print("\nReport complete.")
         another = input("Would you like to run another assessment? (yes/no): ").lower()
-        if another != 'yes':
+        if another != "yes":
             print("Exiting the tool. Thank you and good bye! 👋")
             break
+
 
 if __name__ == "__main__":
     main()
