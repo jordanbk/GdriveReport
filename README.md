@@ -14,7 +14,7 @@
 ```git clone https://github.com/jordanbk/GdriveReport.git```
 - Change directory to the root of the project:
 ```cd GdriveReport```
-- Move credentials.json to cwd:
+- Move the credentials file to cwd:
 ```mv /path/to/credentials.json .```
 - Install dependencies and set up the project:
 ```
