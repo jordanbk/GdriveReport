@@ -19,6 +19,6 @@
 
 ```
 $ pip3 install -U pip
-$ pip3 install -U -r requirements.txt
-$ python3 main.py
+$ pip3 install -e .
+$ gdrive_report
 ```
