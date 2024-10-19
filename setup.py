@@ -12,7 +12,7 @@ setup(
     install_requires=parse_requirements('requirements.txt'),  # Load dependencies from requirements.txt
     entry_points={
         'console_scripts': [
-            'gdrive_reports=main:main',  # Entry point to your main script function
+            'gdrivereports=main:main',  # Entry point to your main script function
         ],
     },
 )
