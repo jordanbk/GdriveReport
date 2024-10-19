@@ -6,7 +6,6 @@
 - In the Credentials tab, click on Create Credentials and select OAuth Client ID.
 - Choose Desktop App as the application type and click Create.
 - Use the download button to download your credentials.
-- Move the file to the root directory of this project.
 - Visit [Google API page](https://console.developers.google.com/apis/library)
 - Search for "Google Drive API" and enable it if it is disabled
 
@@ -23,6 +22,6 @@ pip3 install -U pip
 pip3 install -e .
 ```
 - Run the program:
-```gdrive_report```
+```python3 main.py```
 
 - Follow the prompts displayed by the program.
