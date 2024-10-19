@@ -9,6 +9,7 @@ __pycache__/
 
 # Ignore personal credentials
 credentials.json
+token.json
 
 # Ignore macOS system files
 .DS_Store

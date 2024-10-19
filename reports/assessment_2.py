@@ -13,8 +13,11 @@ def count_recursive(source_folder_id: str) -> None:
     Args:
         source_folder_id (str): The ID of the source Google Drive folder.
     """
-    # Authenticate and get access to the Google Drive API
     service: Optional[Resource] = authenticate_gdrive()
+
+    if service is None:
+        print("Failed to authenticate with Google Drive. Exiting.")
+        return
 
     if service is None:
         print("Error: Could not authenticate with Google Drive API.")
