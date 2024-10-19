@@ -2,14 +2,14 @@ import os
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
+from googleapiclient.discovery import build, Resource
 from googleapiclient.errors import HttpError
+from typing import Optional
 
 # The scope we require for accessing Google Drive metadata
 SCOPES = ["https://www.googleapis.com/auth/drive"]
 
-
-def authenticate_gdrive():
+def authenticate_gdrive() -> Optional[Resource]:
     """
     Authenticates the user to the Google Drive API using OAuth 2.0, returning a service instance
     that can be used to interact with the Google Drive API.
@@ -19,13 +19,13 @@ def authenticate_gdrive():
     new credentials are saved for future use.
 
     Returns:
-        service (googleapiclient.discovery.Resource): A service instance to interact with Google Drive API.
+        Optional[Resource]: A service instance to interact with Google Drive API, or None if there's an error.
 
     Raises:
         HttpError: If an error occurs while attempting to authenticate or build the service.
     """
 
-    creds = None
+    creds: Optional[Credentials] = None
     token_file = "token.json"
 
     # Check if the 'token.json' file exists, which contains previously stored credentials
@@ -49,7 +49,7 @@ def authenticate_gdrive():
 
     try:
         # Build the Google Drive service using the authenticated credentials
-        service = build("drive", "v3", credentials=creds)
+        service: Resource = build("drive", "v3", credentials=creds)
         return service
     except HttpError as error:
         # Handle errors that occur while trying to connect to the Google Drive API

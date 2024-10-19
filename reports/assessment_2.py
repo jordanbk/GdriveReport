@@ -1,8 +1,9 @@
+from typing import Tuple, Optional
+from googleapiclient.discovery import Resource
 from gdrive.auth import authenticate_gdrive
 from gdrive.utils import count_files_and_folders
 
-
-def count_recursive(source_folder_id):
+def count_recursive(source_folder_id: str) -> None:
     """
     Generates a report that recursively counts the total number of child objects (files and folders)
     for each top-level folder inside the given source folder. It also prints a tree structure showing
@@ -12,9 +13,13 @@ def count_recursive(source_folder_id):
         source_folder_id (str): The ID of the source Google Drive folder.
     """
     # Authenticate and get access to the Google Drive API
-    service = authenticate_gdrive()
+    service: Optional[Resource] = authenticate_gdrive()
 
-    def count_children(folder_id, folder_name, level=0):
+    if service is None:
+        print("Error: Could not authenticate with Google Drive API.")
+        return
+
+    def count_children(folder_id: str, folder_name: str, level: int = 0) -> Tuple[int, int]:
         """
         Recursively count all files and folders in a given folder, including any nested subfolders.
         Prints a tree structure for visualization.

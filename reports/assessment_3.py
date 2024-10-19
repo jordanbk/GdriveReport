@@ -1,16 +1,18 @@
+from typing import List, Dict, Any, Optional, Tuple
+from googleapiclient.discovery import Resource
 from gdrive.auth import authenticate_gdrive
 
 
-def count_total_items(service, folder_id):
+def count_total_items(service: Resource, folder_id: str) -> int:
     """
     Recursively count all files and subfolders in a Google Drive folder.
 
     Args:
-        service: The authenticated Google Drive API service.
-        folder_id: The ID of the folder to count items in.
+        service (Resource): The authenticated Google Drive API service.
+        folder_id (str): The ID of the folder to count items in.
 
     Returns:
-        The total number of items (files and folders) in the folder and its subfolders.
+        int: The total number of items (files and folders) in the folder and its subfolders.
     """
     query = f"'{folder_id}' in parents and trashed=false"
     response = service.files().list(q=query, fields="files(id, mimeType)").execute()
@@ -28,7 +30,7 @@ def count_total_items(service, folder_id):
     return total_items
 
 
-def copy_folder_contents(source_folder_id, destination_folder_id):
+def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> None:
     """
     Copies all contents (files and subfolders) from the source Google Drive folder
     to the destination folder. This is done recursively for nested folders.
@@ -38,17 +40,21 @@ def copy_folder_contents(source_folder_id, destination_folder_id):
         destination_folder_id (str): The ID of the destination Google Drive folder.
     """
     # Authenticate and get access to the Google Drive API
-    service = authenticate_gdrive()
+    service: Optional[Resource] = authenticate_gdrive()
+
+    if service is None:
+        print("Error: Could not authenticate with Google Drive API.")
+        return
 
     # Step 1: Count total items to copy
     print("Counting total items to copy...")
-    total_items = count_total_items(service, source_folder_id)
+    total_items: int = count_total_items(service, source_folder_id)
     print(f"Total items to copy: {total_items}")
 
     # Initialize total count for progress tracking
-    total_items_copied = 0
+    total_items_copied: int = 0
 
-    def copy_files_and_folders(source_id, dest_id):
+    def copy_files_and_folders(source_id: str, dest_id: str) -> None:
         """
         Recursively copy all files and folders from the source folder to the destination folder,
         providing progress feedback to the user.
@@ -70,7 +76,7 @@ def copy_folder_contents(source_folder_id, destination_folder_id):
 
         # Loop through each file and folder found in the source folder
         for file in files:
-            copied_file = None
+            copied_file: Optional[Dict[str, Any]] = None
 
             # If the current file is a folder, recursively copy its contents
             if file["mimeType"] == "application/vnd.google-apps.folder":
@@ -82,7 +88,6 @@ def copy_folder_contents(source_folder_id, destination_folder_id):
                 copied_file = (
                     service.files().create(body=folder_metadata, fields="id").execute()
                 )
-                # print(f"Folder copied: {file['name']}")
                 # Recursively copy subfolder
                 copy_files_and_folders(file["id"], copied_file["id"])
             else:
@@ -93,7 +98,6 @@ def copy_folder_contents(source_folder_id, destination_folder_id):
                     .copy(fileId=file["id"], body=file_metadata)
                     .execute()
                 )
-                # print(f"File copied: {file['name']}")
 
             # Increment the progress counter and display progress
             total_items_copied += 1
@@ -121,17 +125,17 @@ def copy_folder_contents(source_folder_id, destination_folder_id):
         print("The folders are not identical after copying.")
 
 
-def compare_folders(service, folder_id1, folder_id2):
+def compare_folders(service: Resource, folder_id1: str, folder_id2: str) -> bool:
     """
     Compare two folders in Google Drive to check if they have the same files and folders.
 
     Args:
-        service: The authenticated Google Drive API service.
-        folder_id1: The ID of the first folder to compare.
-        folder_id2: The ID of the second folder to compare.
+        service (Resource): The authenticated Google Drive API service.
+        folder_id1 (str): The ID of the first folder to compare.
+        folder_id2 (str): The ID of the second folder to compare.
 
     Returns:
-        True if the folders are equal, False otherwise.
+        bool: True if the folders are equal, False otherwise.
     """
 
     # Retrieve contents of both folders
@@ -171,16 +175,16 @@ def compare_folders(service, folder_id1, folder_id2):
     return True
 
 
-def get_folder_contents(service, folder_id):
+def get_folder_contents(service: Resource, folder_id: str) -> List[Dict[str, Any]]:
     """
     Retrieve all non-trashed files and folders in a folder, including subfolders.
 
     Args:
-        service: The Google Drive API service instance.
-        folder_id: The ID of the folder to retrieve contents from.
+        service (Resource): The Google Drive API service instance.
+        folder_id (str): The ID of the folder to retrieve contents from.
 
     Returns:
-        A list of dictionaries containing file metadata (id, name, mimeType).
+        List[Dict[str, Any]]: A list of dictionaries containing file metadata (id, name, mimeType).
     """
     query = f"'{folder_id}' in parents and trashed=false"
     response = (

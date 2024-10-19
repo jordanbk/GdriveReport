@@ -1,4 +1,7 @@
-def count_files_and_folders(service, folder_id):
+from googleapiclient.discovery import Resource
+from typing import Tuple
+
+def count_files_and_folders(service: Resource, folder_id: str) -> Tuple[int, int]:
     """
     Counts the number of files and folders that are direct children of a given Google Drive folder.
 
