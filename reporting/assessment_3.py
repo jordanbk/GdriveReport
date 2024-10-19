@@ -75,7 +75,8 @@ def copy_folder_contents(source_folder_id, destination_folder_id):
                 }
                 copied_file = service.files().create(body=folder_metadata, fields='id').execute()
                 # print(f"Folder copied: {file['name']}")
-                copy_files_and_folders(file['id'], copied_file['id'])  # Recursively copy subfolder
+                # Recursively copy subfolder
+                copy_files_and_folders(file['id'], copied_file['id'])
             else:
                 # If the file is not a folder, copy it to the destination
                 file_metadata = {
