@@ -20,7 +20,5 @@
 ```
 $ pip3 install -U pip
 $ pip3 install -U -r requirements.txt
-$ python3 reports/src/assessment_1.py
-$ python3 reports/src/assessment_2.py
-$ python3 reports/src/assessment_3.py
+$ python3 main.py
 ```
