@@ -2,7 +2,7 @@ from typing import List, Dict, Any, Optional
 from googleapiclient.discovery import Resource
 from gdrive.auth import authenticate_gdrive
 from gdrive.utils import count_total_items, get_folder_contents
-
+from tqdm import tqdm
 
 def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> None:
     """
@@ -25,6 +25,7 @@ def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> N
     print(f"Total items to copy: {total_items}")
 
     total_items_copied: int = 0
+    progress_bar = tqdm(total=total_items, desc="Copying items", unit="item")
 
     def copy_files_and_folders(source_id: str, dest_id: str) -> None:
         nonlocal total_items_copied
@@ -60,14 +61,16 @@ def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> N
                 )
 
             total_items_copied += 1
-            print(f"Progress: {total_items_copied}/{total_items} items copied.")
+            progress_bar.update(1)
+
+            # print(f"Progress: {total_items_copied}/{total_items} items copied.")
 
     # Start copying the contents of the source folder to the destination
     print(
         f"Starting to copy contents from {source_folder_id} to {destination_folder_id}..."
     )
     copy_files_and_folders(source_folder_id, destination_folder_id)
-
+    progress_bar.close()
     # Notify the user that the process has completed
     print(
         f"Congrats! {total_items_copied} items have been copied from {source_folder_id} to {destination_folder_id}."
