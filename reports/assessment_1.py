@@ -18,8 +18,8 @@ def count_files(source_folder_id: str) -> None:
     file_count, folder_count = count_files_and_folders(service, source_folder_id)
 
     # Output the total number of files and folders at the root level
-    print(f"Total files: {file_count}")
-    print(f"Total folders: {folder_count}")
+    print(f"Total files at the root of the source folder: {file_count}")
+    print(f"Total folders at the root of the source folder: {folder_count}")
 
 
 if __name__ == "__main__":
