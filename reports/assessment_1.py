@@ -14,6 +14,10 @@ def count_files(source_folder_id: str) -> None:
     # Authenticate and get access to the Google Drive API
     service: Resource = authenticate_gdrive()
 
+    if service is None:
+        print("Failed to authenticate with Google Drive. Exiting.")
+        return
+
     # Count the number of files and folders at the root of the source folder
     file_count, folder_count = count_files_and_folders(service, source_folder_id)
 
