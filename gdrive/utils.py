@@ -19,8 +19,12 @@ def count_files_and_folders(service: Resource, folder_id: str) -> Tuple[int, int
     response = service.files().list(q=query, fields="files(id, mimeType)").execute()
     files = response.get("files", [])
 
-    file_count = sum(1 for file in files if file["mimeType"] != "application/vnd.google-apps.folder")
-    folder_count = sum(1 for file in files if file["mimeType"] == "application/vnd.google-apps.folder")
+    file_count = sum(
+        1 for file in files if file["mimeType"] != "application/vnd.google-apps.folder"
+    )
+    folder_count = sum(
+        1 for file in files if file["mimeType"] == "application/vnd.google-apps.folder"
+    )
 
     return file_count, folder_count
 
@@ -45,7 +49,9 @@ def count_total_items(service: Resource, folder_id: str) -> int:
     for file in files:
         total_items += 1
         if file["mimeType"] == "application/vnd.google-apps.folder":
-            total_items += count_total_items(service, file["id"])  # Recursively count subfolder items
+            total_items += count_total_items(
+                service, file["id"]
+            )  # Recursively count subfolder items
 
     return total_items
 
@@ -62,5 +68,9 @@ def get_folder_contents(service: Resource, folder_id: str) -> List[Dict[str, Any
         List[Dict[str, Any]]: A list of dictionaries containing file metadata (id, name, mimeType).
     """
     query = f"'{folder_id}' in parents and trashed=false"
-    response = service.files().list(q=query, fields="files(id, name, mimeType, size, modifiedTime)").execute()
+    response = (
+        service.files()
+        .list(q=query, fields="files(id, name, mimeType, size, modifiedTime)")
+        .execute()
+    )
     return response.get("files", [])

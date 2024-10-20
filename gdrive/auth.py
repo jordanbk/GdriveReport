@@ -46,7 +46,9 @@ def authenticate_gdrive() -> Optional[Resource]:
             # Use glob to find any file that matches the client_secret_*.json pattern
             client_secret_files = glob.glob("client_secret_*.json")
             if not client_secret_files:
-                print("Error: No client secret file found. Please download it from the Google Cloud Console.")
+                print(
+                    "Error: No client secret file found. Please download it from the Google Cloud Console."
+                )
                 return None
 
             # Use the first matching client secret file

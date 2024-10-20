@@ -3,6 +3,7 @@ from googleapiclient.discovery import Resource
 from gdrive.auth import authenticate_gdrive
 from gdrive.utils import count_total_items, get_folder_contents
 
+
 def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> None:
     """
     Copies all contents (files and subfolders) from the source Google Drive folder
@@ -28,7 +29,9 @@ def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> N
     def copy_files_and_folders(source_id: str, dest_id: str) -> None:
         nonlocal total_items_copied
         query = f"'{source_id}' in parents and trashed=false"
-        response = service.files().list(q=query, fields="files(id, name, mimeType)").execute()
+        response = (
+            service.files().list(q=query, fields="files(id, name, mimeType)").execute()
+        )
 
         files = response.get("files", [])
 
@@ -41,25 +44,39 @@ def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> N
                     "mimeType": "application/vnd.google-apps.folder",
                     "parents": [dest_id],
                 }
-                copied_file = service.files().create(body=folder_metadata, fields="id").execute()
-                copy_files_and_folders(file["id"], copied_file["id"])  # Recursively copy subfolders
+                copied_file = (
+                    service.files().create(body=folder_metadata, fields="id").execute()
+                )
+                copy_files_and_folders(
+                    file["id"], copied_file["id"]
+                )  # Recursively copy subfolders
             else:
                 # Copy individual files
                 file_metadata = {"name": file["name"], "parents": [dest_id]}
-                copied_file = service.files().copy(fileId=file["id"], body=file_metadata).execute()
+                copied_file = (
+                    service.files()
+                    .copy(fileId=file["id"], body=file_metadata)
+                    .execute()
+                )
 
             total_items_copied += 1
             print(f"Progress: {total_items_copied}/{total_items} items copied.")
 
     # Start copying the contents of the source folder to the destination
-    print(f"Starting to copy contents from {source_folder_id} to {destination_folder_id}...")
+    print(
+        f"Starting to copy contents from {source_folder_id} to {destination_folder_id}..."
+    )
     copy_files_and_folders(source_folder_id, destination_folder_id)
 
     # Notify the user that the process has completed
-    print(f"Congrats! {total_items_copied} items have been copied from {source_folder_id} to {destination_folder_id}.")
+    print(
+        f"Congrats! {total_items_copied} items have been copied from {source_folder_id} to {destination_folder_id}."
+    )
 
     # Check if the source and destination folders are identical
-    print(f"Running test to ensure source folder: {source_folder_id} equals destination folder: {destination_folder_id}...")
+    print(
+        f"Running test to ensure source folder: {source_folder_id} equals destination folder: {destination_folder_id}..."
+    )
 
     if compare_folders(service, source_folder_id, destination_folder_id):
         print("The folders are identical after copying.")
@@ -86,7 +103,9 @@ def compare_folders(service: Resource, folder_id1: str, folder_id2: str) -> bool
     folder2_contents.sort(key=lambda x: x["name"])
 
     if len(folder1_contents) != len(folder2_contents):
-        print(f"Folder content mismatch: {len(folder1_contents)} items in folder 1, {len(folder2_contents)} items in folder 2")
+        print(
+            f"Folder content mismatch: {len(folder1_contents)} items in folder 1, {len(folder2_contents)} items in folder 2"
+        )
         return False
 
     for file1, file2 in zip(folder1_contents, folder2_contents):
