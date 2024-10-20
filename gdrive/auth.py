@@ -1,4 +1,5 @@
 import os
+import glob
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
@@ -41,7 +42,18 @@ def authenticate_gdrive() -> Optional[Resource]:
             creds.refresh(Request())
         else:
             # No valid credentials exist, prompt the user to log in using OAuth 2.0
-            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+
+            # Use glob to find any file that matches the client_secret_*.json pattern
+            client_secret_files = glob.glob("client_secret_*.json")
+            if not client_secret_files:
+                print("Error: No client secret file found. Please download it from the Google Cloud Console.")
+                return None
+
+            # Use the first matching client secret file
+            client_secret_file = client_secret_files[0]
+
+            # Prompt the user to log in using the found client secret file
+            flow = InstalledAppFlow.from_client_secrets_file(client_secret_file, SCOPES)
             creds = flow.run_local_server(port=0)  # Opens a local server for OAuth flow
 
         # Save the new credentials to 'token.json' for future use

@@ -5,7 +5,7 @@
 - Navigate to the OAuth Consent Screen tab, complete the necessary fields, save.
 - In the Credentials tab, click on Create Credentials and select OAuth Client ID.
 - Choose Desktop App as the application type and click Create.
-- Use the download button to download your credentials.
+- Use the download button to download your client secret.
 - Visit [Google API page](https://console.developers.google.com/apis/library)
 - Search for "Google Drive API" and enable it if it is disabled
 
@@ -14,8 +14,8 @@
 ```git clone https://github.com/jordanbk/GdriveReport.git```
 - Change directory to the root of the project:
 ```cd GdriveReport```
-- Move the credentials file to cwd:
-```mv /path/to/client_secret* credentials.json```
+- Move the client_secret*.json file (downloaded from Google) to the current working directory:
+```mv /path/to/client_secret_*.json .```
 - Install dependencies and set up the project:
 ```
 pip3 install -U pip
