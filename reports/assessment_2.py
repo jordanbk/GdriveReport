@@ -19,10 +19,6 @@ def count_recursive(source_folder_id: str) -> None:
         print("Failed to authenticate with Google Drive. Exiting.")
         return
 
-    if service is None:
-        print("Error: Could not authenticate with Google Drive API.")
-        return
-
     def count_children(
         folder_id: str, folder_name: str, level: int = 0
     ) -> Tuple[int, int]:
