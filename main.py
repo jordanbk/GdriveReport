@@ -106,24 +106,33 @@ class GDriveReportingTool:
                 folder_id = self.get_folder_id()
                 print(Fore.YELLOW + "\nRunning Assessment 1...")
                 assessment_1.count_files(folder_id)
+
             elif self.assessment_number == 2:
                 folder_id = self.get_folder_id()
                 print(Fore.YELLOW + "\nRunning Assessment 2...")
                 assessment_2.count_recursive(folder_id)
-            elif self.assessment_number == 3:
-                folder_id = self.get_source_folder_id()
-                destination_folder_id = self.get_destination_folder_id()
-                print(Fore.YELLOW + "\nRunning Assessment 3...")
-                assessment_3.copy_folder_contents(folder_id, destination_folder_id)
 
-            # After the assessment finishes, ask the user if they want to run another assessment
-            print("\nReport complete!")
-            another = input(
-                "\nWould you like to run another assessment? (yes/no): "
-            ).lower()
-            if another != "yes":
-                print("\nExiting the tool. Thank you and good bye! 👋")
-                break
+            elif self.assessment_number == 3:
+                folder_id = self.get_source_folder_id()  # Get source folder ID
+                destination_folder_id = self.get_destination_folder_id()  # Get destination folder ID
+                
+                # Ensure source and destination folder IDs are not the same
+                if folder_id == destination_folder_id:
+                    print(Fore.RED + "Error: The source folder ID cannot be the same as the destination folder ID.")
+                    return  # Exit the function to prevent copying
+                else:
+                    print(Fore.YELLOW + "\nRunning Assessment 3...")
+                    # Proceed with copying if the IDs are different
+                    assessment_3.copy_folder_contents(folder_id, destination_folder_id)
+
+                # After the assessment finishes, ask the user if they want to run another assessment
+                print("\nReport complete!")
+                another = input(
+                    "\nWould you like to run another assessment? (yes/no): "
+                ).lower()
+                if another != "yes":
+                    print("\nExiting the tool. Thank you and good bye! 👋")
+                    break
 
 
 if __name__ == "__main__":

@@ -1,6 +1,8 @@
 from googleapiclient.discovery import Resource
 from typing import Tuple, List, Dict, Any
 from colorama import Fore, Style
+import time
+import random
 
 def list_drive_files(service: Resource, folder_id: str, fields: str) -> List[Dict[str, Any]]:
     """
@@ -79,6 +81,33 @@ def get_folder_contents(service: Resource, folder_id: str) -> List[Dict[str, Any
         List[Dict[str, Any]]: A list of dictionaries containing file metadata (id, name, mimeType).
     """
     return list_drive_files(service, folder_id, "files(id, name, mimeType, size, modifiedTime)")
+
+def exponential_backoff_retry(api_call, *args, retries=5, **kwargs):
+    """
+    Attempts to execute an API call with exponential backoff retries in case of timeouts or errors.
+
+    Args:
+        api_call (function): The API call function to execute.
+        retries (int): Maximum number of retries for the request.
+        *args: Arguments to pass to the API call.
+        **kwargs: Keyword arguments to pass to the API call.
+
+    Returns:
+        result: The result of the API call if successful.
+    """
+    attempt = 0
+    while attempt < retries:
+        try:
+            # Try executing the API call with both positional and keyword arguments
+            return api_call(*args, **kwargs)
+        except Exception as e:
+            # Print the error and retry after waiting
+            print(f"Error executing API call: {e}. Retrying in {2 ** attempt} seconds...")
+            time.sleep(2 ** attempt + random.uniform(0, 1))  # Exponential backoff with jitter
+            attempt += 1
+    
+    # If all retries fail, raise an error
+    raise Exception(f"Failed to execute API call after {retries} attempts")
 
 
 # Define a list of colors to cycle through

@@ -1,7 +1,7 @@
 from typing import List, Dict, Any, Optional
 from googleapiclient.discovery import Resource
 from gdrive.auth import authenticate_gdrive
-from gdrive.utils import count_total_items, get_folder_contents, list_drive_files, get_rainbow_bar_format
+from gdrive.utils import count_total_items, get_folder_contents, list_drive_files, exponential_backoff_retry, get_rainbow_bar_format
 from tqdm import tqdm
 from colorama import Fore, Style, init
 
@@ -51,22 +51,16 @@ def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> N
                     "mimeType": "application/vnd.google-apps.folder",
                     "parents": [dest_id],
                 }
-                # Create the folder in the destination and store its metadata
-                copied_file = (
-                    service.files().create(body=folder_metadata, fields="id").execute()
-                )
+                # Create the folder in the destination using exponential backoff retry logic
+                copied_file = exponential_backoff_retry(service.files().create, body=folder_metadata, fields="id").execute()
+
                 # Recursively copy the subfolder contents
-                copy_files_and_folders(
-                    file["id"], copied_file["id"]
-                )
+                copy_files_and_folders(file["id"], copied_file["id"])
             else:
-                # If the current item is a file, copy the file to the destination folder
+                # If the current item is a file, copy the file to the destination folder with retry logic
                 file_metadata = {"name": file["name"], "parents": [dest_id]}
-                copied_file = (
-                    service.files()
-                    .copy(fileId=file["id"], body=file_metadata)
-                    .execute()
-                )
+                copied_file = exponential_backoff_retry(service.files().copy, fileId=file["id"], body=file_metadata).execute()
+
             # Increment and update progress
             total_items_copied += 1
             progress_bar.bar_format = get_rainbow_bar_format(total_items_copied)
@@ -105,8 +99,9 @@ def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> N
 
 def compare_folders(service: Resource, folder_id1: str, folder_id2: str) -> bool:
     """
-    Compare two folders in Google Drive to check if they have the same files and folders.
-
+    Compare two folders in Google Drive to check if they have the same files and folders,
+    excluding size checks for Google-native files (Google Docs, Sheets, Slides).
+    
     Args:
         service (Resource): The authenticated Google Drive API service.
         folder_id1 (str): The ID of the first folder to compare.
@@ -115,8 +110,7 @@ def compare_folders(service: Resource, folder_id1: str, folder_id2: str) -> bool
     Returns:
         bool: True if the folders are equal, False otherwise.
     """
-
-     # Retrieve the contents (files and folders) of both folders using the helper function
+    # Retrieve the contents (files and folders) of both folders using the helper function
     folder1_contents = get_folder_contents(service, folder_id1)
     folder2_contents = get_folder_contents(service, folder_id2)
 
@@ -130,22 +124,33 @@ def compare_folders(service: Resource, folder_id1: str, folder_id2: str) -> bool
             f"Folder content mismatch: {len(folder1_contents)} items in folder 1, {len(folder2_contents)} items in folder 2"
         )
         return False
-    
+
     # Iterate through the contents of both folders simultaneously and compare each item
     for file1, file2 in zip(folder1_contents, folder2_contents):
         # Compare file/folder names and MIME types; if they don't match, the folders are not equal
         if file1["name"] != file2["name"] or file1["mimeType"] != file2["mimeType"]:
             print(f"Mismatch: {file1['name']} in folder 1, {file2['name']} in folder 2")
             return False
-        
+
+        # If the item is a file and is not a Google-native file, compare its size
+        if file1["mimeType"] != "application/vnd.google-apps.folder":
+            if not file1["mimeType"].startswith("application/vnd.google-apps."):  # Exclude Google-native files
+                size1 = int(file1.get("size", 0))  # Get the size of file1 (default to 0 if not present)
+                size2 = int(file2.get("size", 0))  # Get the size of file2 (default to 0 if not present)
+                if size1 != size2:
+                    print(
+                        f"Size mismatch for file {file1['name']}: "
+                        f"{size1} bytes in folder 1, {size2} bytes in folder 2"
+                    )
+                    return False
+
         # If the item is a folder, recursively compare the contents of both folders
         if file1["mimeType"] == "application/vnd.google-apps.folder":
             if not compare_folders(service, file1["id"], file2["id"]):
                 return False
-            
+
     # If all checks pass, the folders are considered equal
     return True
-
 
 if __name__ == "__main__":
     """
