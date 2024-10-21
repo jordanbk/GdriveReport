@@ -21,7 +21,6 @@ def list_drive_files(service: Resource, folder_id: str, fields: str) -> List[Dic
     return response.get("files", [])
 
 
-
 def count_files_and_folders(service: Resource, folder_id: str) -> Tuple[int, int]:
     """
     Counts the number of files and folders that are direct children of a given Google Drive folder.
@@ -130,7 +129,4 @@ def print_welcome():
 #                                         /_/                                                                    
 """
     print(welcome_art)
-
-if __name__ == "__main__":
-    print_welcome()
 
