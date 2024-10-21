@@ -1,7 +1,10 @@
 from gdrive.auth import authenticate_gdrive
 from gdrive.utils import count_files_and_folders
 from googleapiclient.discovery import Resource
+from colorama import Fore, Style, init
 
+# Initialize colorama
+init(autoreset=True)
 
 def count_files(source_folder_id: str) -> None:
     """
@@ -22,8 +25,10 @@ def count_files(source_folder_id: str) -> None:
     file_count, folder_count = count_files_and_folders(service, source_folder_id)
 
     # Output the total number of files and folders at the root level
-    print(f"Total files at the root of the source folder: {file_count}")
-    print(f"Total folders at the root of the source folder: {folder_count}")
+    print(Fore.YELLOW + "\n-----------------------------------------")
+    print(Fore.CYAN + f"\n{Fore.GREEN}Total files at the root of the source folder: {Fore.WHITE}{file_count}")
+    print(Fore.CYAN + f"\n{Fore.GREEN}Total folders at the root of the source folder: {Fore.WHITE}{folder_count}")
+    print(Fore.YELLOW + "\n-----------------------------------------")
 
 
 if __name__ == "__main__":

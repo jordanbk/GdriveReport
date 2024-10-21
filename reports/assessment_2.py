@@ -2,7 +2,10 @@ from typing import Tuple, Optional
 from googleapiclient.discovery import Resource
 from gdrive.auth import authenticate_gdrive
 from gdrive.utils import count_files_and_folders
+from colorama import Fore, Style, init
 
+# Initialize colorama
+init(autoreset=True)
 
 def count_recursive(source_folder_id: str) -> None:
     """
@@ -87,13 +90,11 @@ def count_recursive(source_folder_id: str) -> None:
     total_files, total_folders = count_children(source_folder_id, root_folder_name)
 
     # Output the results
-    print(
-        f"\nTotal number of child objects (recursively) across all top-level folders: {total_files}"
-    )
-    print(f"Total number of nested folders within the source folder: {total_folders}")
-    print(
-        f"Total items (files + folders, excluding root folder): {total_files + total_folders}"
-    )
+    print(Fore.YELLOW + "\n-----------------------------------------")
+    print(f"\n{Fore.GREEN}Total number of child objects (recursively) across all top-level folders: {Fore.WHITE}{total_files}")
+    print(f"\n{Fore.GREEN}Total number of nested folders within the source folder: {Fore.WHITE}{total_folders}")
+    print(f"\n{Fore.GREEN}Total items (files + folders, excluding root folder): {Fore.WHITE}{total_files + total_folders}")
+    print(Fore.YELLOW + "\n-----------------------------------------")
 
 
 if __name__ == "__main__":

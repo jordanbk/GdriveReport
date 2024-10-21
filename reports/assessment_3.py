@@ -1,8 +1,12 @@
 from typing import List, Dict, Any, Optional
 from googleapiclient.discovery import Resource
 from gdrive.auth import authenticate_gdrive
-from gdrive.utils import count_total_items, get_folder_contents
+from gdrive.utils import count_total_items, get_folder_contents, get_rainbow_bar_format
 from tqdm import tqdm
+from colorama import Fore, Style, init
+
+# Initialize colorama
+init(autoreset=True)
 
 def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> None:
     """
@@ -20,12 +24,12 @@ def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> N
         return
 
     # Step 1: Count total items to copy
-    print("Counting total items to copy...")
+    print("\nCounting total items to copy...")
     total_items: int = count_total_items(service, source_folder_id)
-    print(f"Total items to copy: {total_items}")
+    print(f"\nTotal items to copy: {total_items}")
 
     total_items_copied: int = 0
-    progress_bar = tqdm(total=total_items, desc="Copying items", unit="item")
+    # progress_bar = tqdm(total=total_items, desc="Copying items", unit="item", dynamic_ncols=True)
 
     def copy_files_and_folders(source_id: str, dest_id: str) -> None:
         nonlocal total_items_copied
@@ -61,30 +65,33 @@ def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> N
                 )
 
             total_items_copied += 1
+            progress_bar.bar_format = get_rainbow_bar_format(total_items_copied)
             progress_bar.update(1)
 
             # print(f"Progress: {total_items_copied}/{total_items} items copied.")
 
     # Start copying the contents of the source folder to the destination
     print(
-        f"Starting to copy contents from {source_folder_id} to {destination_folder_id}..."
+        f"\nStarting to copy contents from {source_folder_id} to {destination_folder_id}..."
     )
+    progress_bar = tqdm(total=total_items, desc="Copying items", unit="item", dynamic_ncols=True)
+
     copy_files_and_folders(source_folder_id, destination_folder_id)
     progress_bar.close()
     # Notify the user that the process has completed
-    print(
-        f"Congrats! {total_items_copied} items have been copied from {source_folder_id} to {destination_folder_id}."
+    print(Fore.GREEN + 
+        f"\nCongrats! {total_items_copied} items have been copied from {source_folder_id} to {destination_folder_id}."
     )
 
     # Check if the source and destination folders are identical
     print(
-        f"Running test to ensure source folder: {source_folder_id} equals destination folder: {destination_folder_id}..."
+        f"\nRunning test to ensure parity..."
     )
 
     if compare_folders(service, source_folder_id, destination_folder_id):
-        print("The folders are identical after copying.")
+        print("\nThe folders are identical after copying.")
     else:
-        print("The folders are not identical after copying.")
+        print("\nThe folders are not identical after copying.")
 
 
 def compare_folders(service: Resource, folder_id1: str, folder_id2: str) -> bool:
@@ -129,6 +136,6 @@ if __name__ == "__main__":
     the function to copy the contents from the source folder to the destination.
     """
     source_folder_id = "1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V"
-    destination_folder_id = input("Please enter the destination folder ID: ")
+    destination_folder_id = input("\nPlease enter the destination folder ID: ")
 
     copy_folder_contents(source_folder_id, destination_folder_id)
