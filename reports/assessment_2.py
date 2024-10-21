@@ -1,7 +1,7 @@
 from typing import Tuple, Optional
 from googleapiclient.discovery import Resource
 from gdrive.auth import authenticate_gdrive
-from gdrive.utils import count_files_and_folders
+from gdrive.utils import count_files_and_folders, list_drive_files
 from colorama import Fore, Style, init
 
 # Initialize colorama
@@ -17,8 +17,11 @@ def count_recursive(source_folder_id: str) -> None:
     Args:
         source_folder_id (str): The ID of the source Google Drive folder.
     """
+
+    # Authenticate the Google Drive API and get a service instance
     service: Optional[Resource] = authenticate_gdrive()
 
+    # Check if authentication failed, and exit if it did
     if service is None:
         print("Failed to authenticate with Google Drive. Exiting.")
         return
@@ -52,14 +55,8 @@ def count_recursive(source_folder_id: str) -> None:
         # Track the total number of nested folders
         nested_folder_count = folder_count
 
-        # Query to list all non-trashed files and folders inside the current folder
-        query = f"'{folder_id}' in parents and trashed=false"
-        response = (
-            service.files().list(q=query, fields="files(id, mimeType, name)").execute()
-        )
-
-        # Get the list of files and folders
-        files = response.get("files", [])
+        # Retrieve all files and folders in the current source folder
+        files = list_drive_files(service, folder_id, "files(id, mimeType, name)")
 
         # Filter out subfolders and files
         subfolders = [
@@ -83,11 +80,13 @@ def count_recursive(source_folder_id: str) -> None:
 
         return file_count, nested_folder_count
 
-    # Get the total number of files and nested folders for the source folder
+    # Get the name of the root folder using the Google Drive API
     response = service.files().get(fileId=source_folder_id, fields="name").execute()
     root_folder_name = response.get(
         "name", "Root Folder"
     )  # Fallback to "Root Folder" if name not found
+    
+    # Start the recursive counting for the source folder
     total_files, total_folders = count_children(source_folder_id, root_folder_name)
 
     # Output the results

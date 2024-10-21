@@ -1,8 +1,23 @@
 from googleapiclient.discovery import Resource
 from typing import Tuple, List, Dict, Any
-from tqdm import tqdm
-from time import sleep
 from colorama import Fore, Style
+
+def list_drive_files(service: Resource, folder_id: str, fields: str) -> List[Dict[str, Any]]:
+    """
+    Helper function to query Google Drive API for files and folders in a specific folder.
+    
+    Args:
+        service (Resource): Google Drive API service instance.
+        folder_id (str): ID of the folder to query.
+        fields (str): Fields to retrieve for each file.
+        
+    Returns:
+        List[Dict[str, Any]]: List of file metadata.
+    """
+    query = f"'{folder_id}' in parents and trashed=false"
+    response = service.files().list(q=query, fields=fields).execute()
+    return response.get("files", [])
+
 
 
 def count_files_and_folders(service: Resource, folder_id: str) -> Tuple[int, int]:
@@ -18,17 +33,15 @@ def count_files_and_folders(service: Resource, folder_id: str) -> Tuple[int, int
             - file_count (int): The number of files in the folder.
             - folder_count (int): The number of folders in the folder.
     """
-    query = f"'{folder_id}' in parents and trashed=false"
-    response = service.files().list(q=query, fields="files(id, mimeType)").execute()
-    files = response.get("files", [])
-
+    files = list_drive_files(service, folder_id, "files(id, mimeType)")
+    
     file_count = sum(
         1 for file in files if file["mimeType"] != "application/vnd.google-apps.folder"
     )
     folder_count = sum(
         1 for file in files if file["mimeType"] == "application/vnd.google-apps.folder"
     )
-
+    
     return file_count, folder_count
 
 
@@ -43,18 +56,13 @@ def count_total_items(service: Resource, folder_id: str) -> int:
     Returns:
         int: The total number of items (files and folders) in the folder and its subfolders.
     """
-    query = f"'{folder_id}' in parents and trashed=false"
-    response = service.files().list(q=query, fields="files(id, mimeType)").execute()
-
+    files = list_drive_files(service, folder_id, "files(id, mimeType)")
     total_items = 0
-    files = response.get("files", [])
-
+    
     for file in files:
         total_items += 1
         if file["mimeType"] == "application/vnd.google-apps.folder":
-            total_items += count_total_items(
-                service, file["id"]
-            )  # Recursively count subfolder items
+            total_items += count_total_items(service, file["id"])  # Recursively count subfolder items
 
     return total_items
 
@@ -70,13 +78,7 @@ def get_folder_contents(service: Resource, folder_id: str) -> List[Dict[str, Any
     Returns:
         List[Dict[str, Any]]: A list of dictionaries containing file metadata (id, name, mimeType).
     """
-    query = f"'{folder_id}' in parents and trashed=false"
-    response = (
-        service.files()
-        .list(q=query, fields="files(id, name, mimeType, size, modifiedTime)")
-        .execute()
-    )
-    return response.get("files", [])
+    return list_drive_files(service, folder_id, "files(id, name, mimeType, size, modifiedTime)")
 
 
 # Define a list of colors to cycle through
