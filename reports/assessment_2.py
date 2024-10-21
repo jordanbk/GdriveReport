@@ -56,7 +56,7 @@ def count_recursive(source_folder_id: str) -> None:
         nested_folder_count = folder_count
 
         # Retrieve all files and folders in the current source folder
-        files = list_drive_files(service, folder_id, "files(id, mimeType, name)")
+        files = list_drive_files(service, folder_id, "files(id, mimeType, name, webViewLink)")
 
         # Filter out subfolders and files
         subfolders = [
@@ -68,7 +68,8 @@ def count_recursive(source_folder_id: str) -> None:
 
         # Print files with indentation based on the level
         for file in files:
-            print("    " * (level + 1) + f"📄 {file['name']} (ID: {file['id']})")
+            file_url = file.get("webViewLink", "No URL available")
+            print("    " * (level + 1) + f"📄 {file['name']} (ID: {file['id']}) - \033]8;;{file_url}\033\\URL\033]8;;\033\\")
 
         # Recursively count files and folders inside each subfolder
         for folder in subfolders:
@@ -85,7 +86,7 @@ def count_recursive(source_folder_id: str) -> None:
     root_folder_name = response.get(
         "name", "Root Folder"
     )  # Fallback to "Root Folder" if name not found
-    
+
     # Start the recursive counting for the source folder
     total_files, total_folders = count_children(source_folder_id, root_folder_name)
 

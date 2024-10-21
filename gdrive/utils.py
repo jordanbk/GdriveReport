@@ -103,6 +103,7 @@ def exponential_backoff_retry(api_call, *args, retries=5, **kwargs):
         except Exception as e:
             # Print the error and retry after waiting
             print(f"Error executing API call: {e}. Retrying in {2 ** attempt} seconds...")
+            # Gradually increases the wait time between retry attempts and adds randomness to prevent synchronized retries.
             time.sleep(2 ** attempt + random.uniform(0, 1))  # Exponential backoff with jitter
             attempt += 1
     
