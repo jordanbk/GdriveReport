@@ -4,6 +4,7 @@ from colorama import Fore, Style, init
 # Initialize colorama
 init(autoreset=True)
 
+
 class GDriveReportingTool:
     def __init__(self):
         """
@@ -20,14 +21,31 @@ class GDriveReportingTool:
         """
         print(Fore.CYAN + "\nWelcome to the Google Drive Reporting Tool!")
         print(Fore.YELLOW + "\nPlease choose which assessment to run:")
-        print(Fore.GREEN + "\n(1) " + Fore.WHITE + "Assessment 1: Count files and folders at the root level")
-        print(Fore.GREEN + "(2) " + Fore.WHITE + "Assessment 2: Recursively count all files and folders")
-        print(Fore.GREEN + "(3) " + Fore.WHITE + "Assessment 3: Copy folder contents from source folder to destination folder")
+        print(
+            Fore.GREEN
+            + "\n(1) "
+            + Fore.WHITE
+            + "Assessment 1: Count files and folders at the root level"
+        )
+        print(
+            Fore.GREEN
+            + "(2) "
+            + Fore.WHITE
+            + "Assessment 2: Recursively count all files and folders"
+        )
+        print(
+            Fore.GREEN
+            + "(3) "
+            + Fore.WHITE
+            + "Assessment 3: Copy folder contents from source folder to destination folder"
+        )
         print(Fore.GREEN + "(4) " + Fore.RED + "Exit")
 
         while True:
             try:
-                self.assessment_number = int(input("Enter the assessment number (1, 2, 3, or 4 to Exit): "))
+                self.assessment_number = int(
+                    input("Enter the assessment number (1, 2, 3, or 4 to Exit): ")
+                )
                 if self.assessment_number in [1, 2, 3, 4]:
                     return self.assessment_number
                 else:
@@ -98,7 +116,9 @@ class GDriveReportingTool:
 
             # After the assessment finishes, ask the user if they want to run another assessment
             print("\nReport complete!")
-            another = input("\nWould you like to run another assessment? (yes/no): ").lower()
+            another = input(
+                "\nWould you like to run another assessment? (yes/no): "
+            ).lower()
             if another != "yes":
                 print("\nExiting the tool. Thank you and good bye! 👋")
                 break

@@ -4,6 +4,7 @@ from tqdm import tqdm
 from time import sleep
 from colorama import Fore, Style
 
+
 def count_files_and_folders(service: Resource, folder_id: str) -> Tuple[int, int]:
     """
     Counts the number of files and folders that are direct children of a given Google Drive folder.
@@ -77,11 +78,12 @@ def get_folder_contents(service: Resource, folder_id: str) -> List[Dict[str, Any
     )
     return response.get("files", [])
 
+
 # Define a list of colors to cycle through
 colors = [Fore.RED, Fore.YELLOW, Fore.GREEN, Fore.CYAN, Fore.BLUE, Fore.MAGENTA]
+
 
 def get_rainbow_bar_format(step):
     # Cycle through colors based on the step
     color = colors[step % len(colors)]
     return "{l_bar}%s{bar}%s{r_bar}" % (color, Style.RESET_ALL)
-

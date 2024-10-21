@@ -14,8 +14,9 @@
 ```git clone https://github.com/jordanbk/GdriveReport.git```
 - Change directory to the root of the project:
 ```cd GdriveReport```
-- Move the client_secret*.json file (downloaded from Google) to the current working directory:
-```mv /path/to/client_secret_*.json .```
+- Download the  (under OAuth 2.0 credentials).
+- Move the client_secret_*.json file (Downloaded from the Google Cloud Console) to the current directory and rename it credentials.json:
+```mv /path/to/client_secret_*.json credentials.json```
 - Install dependencies and set up the project:
 ```
 pip3 install -U pip

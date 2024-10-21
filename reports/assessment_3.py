@@ -8,6 +8,7 @@ from colorama import Fore, Style, init
 # Initialize colorama
 init(autoreset=True)
 
+
 def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> None:
     """
     Copies all contents (files and subfolders) from the source Google Drive folder
@@ -74,19 +75,20 @@ def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> N
     print(
         f"\nStarting to copy contents from {source_folder_id} to {destination_folder_id}..."
     )
-    progress_bar = tqdm(total=total_items, desc="Copying items", unit="item", dynamic_ncols=True)
+    progress_bar = tqdm(
+        total=total_items, desc="Copying items", unit="item", dynamic_ncols=True
+    )
 
     copy_files_and_folders(source_folder_id, destination_folder_id)
     progress_bar.close()
     # Notify the user that the process has completed
-    print(Fore.GREEN + 
-        f"\nCongrats! {total_items_copied} items have been copied from {source_folder_id} to {destination_folder_id}."
+    print(
+        Fore.GREEN
+        + f"\nCongrats! {total_items_copied} items have been copied from {source_folder_id} to {destination_folder_id}."
     )
 
     # Check if the source and destination folders are identical
-    print(
-        f"\nRunning test to ensure parity..."
-    )
+    print(f"\nRunning test to ensure parity...")
 
     if compare_folders(service, source_folder_id, destination_folder_id):
         print("\nThe folders are identical after copying.")

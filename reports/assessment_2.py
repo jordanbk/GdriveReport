@@ -7,6 +7,7 @@ from colorama import Fore, Style, init
 # Initialize colorama
 init(autoreset=True)
 
+
 def count_recursive(source_folder_id: str) -> None:
     """
     Generates a report that recursively counts the total number of child objects (files and folders)
@@ -91,9 +92,15 @@ def count_recursive(source_folder_id: str) -> None:
 
     # Output the results
     print(Fore.YELLOW + "\n-----------------------------------------")
-    print(f"\n{Fore.GREEN}Total number of child objects (recursively) across all top-level folders: {Fore.WHITE}{total_files}")
-    print(f"\n{Fore.GREEN}Total number of nested folders within the source folder: {Fore.WHITE}{total_folders}")
-    print(f"\n{Fore.GREEN}Total items (files + folders, excluding root folder): {Fore.WHITE}{total_files + total_folders}")
+    print(
+        f"\n{Fore.GREEN}Total number of child objects (recursively) across all top-level folders: {Fore.WHITE}{total_files}"
+    )
+    print(
+        f"\n{Fore.GREEN}Total number of nested folders within the source folder: {Fore.WHITE}{total_folders}"
+    )
+    print(
+        f"\n{Fore.GREEN}Total items (files + folders, excluding root folder): {Fore.WHITE}{total_files + total_folders}"
+    )
     print(Fore.YELLOW + "\n-----------------------------------------")
 
 
