@@ -69,7 +69,7 @@ def count_recursive(source_folder_id: str) -> None:
         # Print files with indentation based on the level
         for file in files:
             file_url = file.get("webViewLink", "No URL available")
-            print("    " * (level + 1) + f"📄 {file['name']} (ID: {file['id']}) - \033]8;;{file_url}\033\\URL\033]8;;\033\\")
+            print("    " * (level + 1) + f"📄 {file['name']} (ID: {file['id']}) - \033]8;;{file_url}\033\\webViewLink\033]8;;\033\\")
 
         # Recursively count files and folders inside each subfolder
         for folder in subfolders:
