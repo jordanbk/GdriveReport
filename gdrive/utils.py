@@ -84,8 +84,23 @@ def get_folder_contents(service: Resource, folder_id: str) -> List[Dict[str, Any
 # Define a list of colors to cycle through
 colors = [Fore.RED, Fore.YELLOW, Fore.GREEN, Fore.CYAN, Fore.BLUE, Fore.MAGENTA]
 
-
 def get_rainbow_bar_format(step):
     # Cycle through colors based on the step
     color = colors[step % len(colors)]
     return "{l_bar}%s{bar}%s{r_bar}" % (color, Style.RESET_ALL)
+
+# https://patorjk.com/software/taag/#p=display&c=bash&f=Slant&t=GdriveReport
+def print_welcome():
+    welcome_art = r"""
+#     ______    __     _            ____                        __ 
+#    / ____/___/ /____(_)   _____  / __ \___  ____  ____  _____/ /_
+#   / / __/ __  / ___/ / | / / _ \/ /_/ / _ \/ __ \/ __ \/ ___/ __/
+#  / /_/ / /_/ / /  / /| |/ /  __/ _, _/  __/ /_/ / /_/ / /  / /_  
+#  \____/\__,_/_/  /_/ |___/\___/_/ |_|\___/ .___/\____/_/   \__/  
+#                                         /_/                                                                    
+"""
+    print(welcome_art)
+
+if __name__ == "__main__":
+    print_welcome()
+

@@ -1,5 +1,6 @@
 from reports import assessment_1, assessment_2, assessment_3
 from colorama import Fore, Back, init
+from gdrive.utils import print_welcome
 
 # Initialize colorama
 init(autoreset=True)
@@ -19,7 +20,8 @@ class GDriveReportingTool:
         Returns:
             int: The chosen assessment number.
         """
-        print(Back.BLACK + Fore.CYAN + "\nWelcome to the Google Drive Reporting Tool!")
+        print_welcome()
+        print(Back.BLACK + Fore.CYAN + "Welcome to the Google Drive Reporting Tool!")
         print(Fore.YELLOW + "\nPlease choose which assessment to run:")
         print(
             Fore.GREEN
