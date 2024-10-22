@@ -7,7 +7,6 @@ from colorama import Fore, Style, init
 # Initialize colorama
 init(autoreset=True)
 
-
 def count_recursive(source_folder_id: str) -> None:
     """
     Generates a report that recursively counts the total number of child objects (files and folders)

@@ -6,7 +6,6 @@ from colorama import Fore, Style, init
 # Initialize colorama
 init(autoreset=True)
 
-
 def count_files(source_folder_id: str) -> None:
     """
     Generates a report that shows the total number of files and folders located
@@ -17,7 +16,7 @@ def count_files(source_folder_id: str) -> None:
     """
     # Authenticate the Google Drive API and get a service instance
     service: Resource = authenticate_gdrive()
-    
+
     # Check if authentication failed, and exit if it did
     if service is None:
         print("Failed to authenticate with Google Drive. Exiting.")

@@ -1,8 +1,9 @@
 from googleapiclient.discovery import Resource
-from typing import Tuple, List, Dict, Any
+from typing import Tuple, Callable, List, Dict, Any
 from colorama import Fore, Style
 import time
 import random
+from functools import wraps
 
 def list_drive_files(service: Resource, folder_id: str, fields: str) -> List[Dict[str, Any]]:
     """
@@ -67,7 +68,6 @@ def count_total_items(service: Resource, folder_id: str) -> int:
 
     return total_items
 
-
 def get_folder_contents(service: Resource, folder_id: str) -> List[Dict[str, Any]]:
     """
     Retrieve all non-trashed files and folders in a folder, including subfolders.
@@ -81,7 +81,7 @@ def get_folder_contents(service: Resource, folder_id: str) -> List[Dict[str, Any
     """
     return list_drive_files(service, folder_id, "files(id, name, mimeType, size, modifiedTime)")
 
-def exponential_backoff_retry(api_call, *args, retries=5, **kwargs):
+def exponential_backoff_retry(api_call: Callable[..., Any], *args: Any, retries: int = 5, **kwargs: Any) -> Any:
     """
     Attempts to execute an API call with exponential backoff retries in case of timeouts or errors.
 
@@ -107,19 +107,33 @@ def exponential_backoff_retry(api_call, *args, retries=5, **kwargs):
             attempt += 1
     
     # If all retries fail, raise an error
-    raise Exception(f"Failed to execute API call after {retries} attempts")
+    raise Exception(f"Failed to execute {api_call.__name__} after {retries} attempts")
 
+def get_rainbow_bar_format(step: int) -> str:
+    """
+    Generates a progress bar format string that changes color based on the step number.
+    
+    The function cycles through a list of predefined colors (stored in `colors`), and selects 
+    a color based on the current step. It formats the progress bar with the selected color 
+    and resets the color formatting at the end.
 
-# Define a list of colors to cycle through
-colors = [Fore.RED, Fore.YELLOW, Fore.GREEN, Fore.CYAN, Fore.BLUE, Fore.MAGENTA]
+    Args:
+        step (int): The current step or iteration number, which determines the color of the progress bar.
 
-def get_rainbow_bar_format(step):
+    Returns:
+        str: A formatted string to be used as the progress bar format with the selected color.
+    """
+    # Define a list of colors to cycle through
+    colors = [Fore.RED, Fore.YELLOW, Fore.GREEN, Fore.CYAN, Fore.BLUE, Fore.MAGENTA]
     # Cycle through colors based on the step
     color = colors[step % len(colors)]
     return "{l_bar}%s{bar}%s{r_bar}" % (color, Style.RESET_ALL)
 
 # https://patorjk.com/software/taag/#p=display&c=bash&f=Slant&t=GdriveReport
-def print_welcome():
+def print_welcome() -> None:
+    """
+    Prints a welcome ASCII art to the console.
+    """
     welcome_art = r"""
 #     ______    __     _            ____                        __ 
 #    / ____/___/ /____(_)   _____  / __ \___  ____  ____  _____/ /_
