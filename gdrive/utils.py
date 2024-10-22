@@ -4,7 +4,42 @@ from colorama import Fore, Style
 import time
 import random
 from functools import wraps
+import logging
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+
+def exponential_backoff_retry(retries: int = 5) -> Callable[..., Any]:
+    """
+    Decorator that applies exponential backoff retries to a function in case of an error.
+    
+    The wrapped function will attempt to execute, and if it raises an exception, 
+    it will retry after a delay that increases exponentially with each attempt.
+    This continues until the function succeeds or the maximum number of retries is reached.
+    
+    Args:
+        retries (int): The maximum number of retry attempts before raising an exception. 
+                       Defaults to 5 retries.
+    Returns:
+        Callable[..., Any]: A wrapped function that includes the retry logic.
+    """
+    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
+        @wraps(func)
+        def wrapper(*args: Any, **kwargs: Any) -> Any:
+            attempt = 0
+            while attempt < retries:
+                try:
+                    # Try executing the function
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    logging.error(f"Error executing {func.__name__}: {e}. Retrying in {2 ** attempt} seconds...")
+                    time.sleep(2 ** attempt + random.uniform(0, 1))  # Exponential backoff with jitter
+                    attempt += 1
+            raise Exception(f"Failed to execute {func.__name__} after {retries} retries")
+        return wrapper
+    return decorator
+
+@exponential_backoff_retry()
 def list_drive_files(service: Resource, folder_id: str, fields: str) -> List[Dict[str, Any]]:
     """
     Helper function to query Google Drive API for files and folders in a specific folder.
@@ -112,24 +147,6 @@ def get_folder_contents(service: Resource, folder_id: str) -> List[Dict[str, Any
     """
     return list_drive_files(service, folder_id, "files(id, name, mimeType, size, modifiedTime)")
 
-
-def exponential_backoff_retry(retries: int = 5) -> Callable[..., Any]:
-    def decorator(func: Callable[..., Any]) -> Callable[..., Any]:
-        @wraps(func)
-        def wrapper(*args: Any, **kwargs: Any) -> Any:
-            attempt = 0
-            while attempt < retries:
-                try:
-                    # Try executing the function
-                    return func(*args, **kwargs)
-                except Exception as e:
-                    print(f"Error executing {func.__name__}: {e}. Retrying in {2 ** attempt} seconds...")
-                    time.sleep(2 ** attempt + random.uniform(0, 1))  # Exponential backoff with jitter
-                    attempt += 1
-            raise Exception(f"Failed to execute {func.__name__} after {retries} retries")
-        return wrapper
-    return decorator
-
 @exponential_backoff_retry()
 def create_folder_with_retry(service: Resource, file: Dict[str, Any], dest_id: str) -> Dict[str, Any]:
     """
@@ -166,35 +183,6 @@ def copy_file_with_retry(service: Resource, file: Dict[str, Any], dest_id: str) 
     """
     file_metadata = {"name": file["name"], "parents": [dest_id]}
     return service.files().copy(fileId=file["id"], body=file_metadata).execute()
-
-
-# def exponential_backoff_retry(api_call: Callable[..., Any], *args: Any, retries: int = 5, **kwargs: Any) -> Any:
-#     """
-#     Attempts to execute an API call with exponential backoff retries in case of timeouts or errors.
-
-#     Args:
-#         api_call (function): The API call function to execute.
-#         retries (int): Maximum number of retries for the request.
-#         *args: Arguments to pass to the API call.
-#         **kwargs: Keyword arguments to pass to the API call.
-
-#     Returns:
-#         result: The result of the API call if successful.
-#     """
-#     attempt = 0
-#     while attempt < retries:
-#         try:
-#             # Try executing the API call with both positional and keyword arguments
-#             return api_call(*args, **kwargs)
-#         except Exception as e:
-#             # Print the error and retry after waiting
-#             print(f"Error executing API call: {e}. Retrying in {2 ** attempt} seconds...")
-#             # Gradually increases the wait time between retry attempts and adds randomness to prevent synchronized retries.
-#             time.sleep(2 ** attempt + random.uniform(0, 1))  # Exponential backoff with jitter
-#             attempt += 1
-    
-#     # If all retries fail, raise an error
-#     raise Exception(f"Failed to execute {api_call.__name__} after {retries} attempts")
 
 def are_folders_identical(service: Resource, folder_id1: str, folder_id2: str) -> bool:
     """
