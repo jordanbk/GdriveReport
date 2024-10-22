@@ -3,6 +3,10 @@ from googleapiclient.discovery import Resource
 from gdrive.auth import authenticate_gdrive
 from gdrive.utils import count_children_recursively
 from colorama import Fore, Style, init
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.WARNING)
 
 # Initialize colorama
 init(autoreset=True)
@@ -22,7 +26,7 @@ def count_recursive(source_folder_id: str) -> None:
 
     # Check if authentication failed, and exit if it did
     if service is None:
-        print(Fore.RED + "Failed to authenticate with Google Drive. Exiting.")
+        logging.error("Failed to authenticate with Google Drive. Exiting.")
         return
 
     # Get the name of the root folder using the Google Drive API

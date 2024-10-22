@@ -7,7 +7,7 @@ from functools import wraps
 import logging
 
 # Configure logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.WARNING)
 
 def exponential_backoff_retry(retries: int = 5) -> Callable[..., Any]:
     """
@@ -40,6 +40,13 @@ def exponential_backoff_retry(retries: int = 5) -> Callable[..., Any]:
     return decorator
 
 @exponential_backoff_retry()
+def execute_with_retry(request):
+    """
+    Helper function to execute a Google Drive API request with retry logic.
+    Applies retries only to the execute() calls to ensure that only the API call itself is retried.
+    """
+    return request.execute()
+
 def list_drive_files(service: Resource, folder_id: str, fields: str) -> List[Dict[str, Any]]:
     """
     Helper function to query Google Drive API for files and folders in a specific folder.
@@ -53,7 +60,8 @@ def list_drive_files(service: Resource, folder_id: str, fields: str) -> List[Dic
         List[Dict[str, Any]]: List of file metadata.
     """
     query = f"'{folder_id}' in parents and trashed=false"
-    response = service.files().list(q=query, fields=fields).execute()
+    request = service.files().list(q=query, fields=fields)
+    response = execute_with_retry(request)
     return response.get("files", [])
 
 def count_children_recursively(service: Resource, folder_id: str, folder_name: str, level: int = 0) -> Tuple[int, int]:
@@ -147,7 +155,6 @@ def get_folder_contents(service: Resource, folder_id: str) -> List[Dict[str, Any
     """
     return list_drive_files(service, folder_id, "files(id, name, mimeType, size, modifiedTime)")
 
-@exponential_backoff_retry()
 def create_folder_with_retry(service: Resource, file: Dict[str, Any], dest_id: str) -> Dict[str, Any]:
     """
     Helper function to create a folder with exponential backoff retry logic.
@@ -165,10 +172,9 @@ def create_folder_with_retry(service: Resource, file: Dict[str, Any], dest_id: s
         "mimeType": "application/vnd.google-apps.folder",
         "parents": [dest_id],
     }
-    return service.files().create(body=folder_metadata, fields="id").execute()
+    request = service.files().create(body=folder_metadata, fields="id")
+    return execute_with_retry(request)
 
-
-@exponential_backoff_retry()
 def copy_file_with_retry(service: Resource, file: Dict[str, Any], dest_id: str) -> Dict[str, Any]:
     """
     Helper function to copy a file with exponential backoff retry logic.
@@ -182,7 +188,8 @@ def copy_file_with_retry(service: Resource, file: Dict[str, Any], dest_id: str) 
         dict: Metadata of the copied file.
     """
     file_metadata = {"name": file["name"], "parents": [dest_id]}
-    return service.files().copy(fileId=file["id"], body=file_metadata).execute()
+    request = service.files().copy(fileId=file["id"], body=file_metadata)
+    return execute_with_retry(request)
 
 def are_folders_identical(service: Resource, folder_id1: str, folder_id2: str) -> bool:
     """
@@ -207,16 +214,14 @@ def are_folders_identical(service: Resource, folder_id1: str, folder_id2: str) -
 
     # Check if the number of items in both folders is the same; if not, the folders are not equal
     if len(folder1_contents) != len(folder2_contents):
-        print(
-            f"Folder content mismatch: {len(folder1_contents)} items in folder 1, {len(folder2_contents)} items in folder 2"
-        )
+        logging.warning(f"Mismatch in item count between folder {folder_id1} and {folder_id2}")
         return False
 
     # Iterate through the contents of both folders simultaneously and compare each item
     for file1, file2 in zip(folder1_contents, folder2_contents):
         # Compare file/folder names and MIME types; if they don't match, the folders are not equal
         if file1["name"] != file2["name"] or file1["mimeType"] != file2["mimeType"]:
-            print(f"Mismatch: {file1['name']} in folder 1, {file2['name']} in folder 2")
+            logging.warning(f"Mismatch: {file1['name']} in folder 1, {file2['name']} in folder 2")
             return False
 
         # If the item is a file and is not a Google-native file, compare its size
@@ -225,7 +230,7 @@ def are_folders_identical(service: Resource, folder_id1: str, folder_id2: str) -
                 size1 = int(file1.get("size", 0))  # Get the size of file1 (default to 0 if not present)
                 size2 = int(file2.get("size", 0))  # Get the size of file2 (default to 0 if not present)
                 if size1 != size2:
-                    print(
+                    logging.WARNING(
                         f"Size mismatch for file {file1['name']}: "
                         f"{size1} bytes in folder 1, {size2} bytes in folder 2"
                     )

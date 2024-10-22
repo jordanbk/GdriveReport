@@ -11,6 +11,10 @@ from gdrive.utils import (
 )
 from tqdm import tqdm
 from colorama import Fore, init
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.WARNING)
 
 # Initialize colorama
 init(autoreset=True)
@@ -30,7 +34,7 @@ def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> N
 
     # Check if authentication failed, and exit if it did
     if service is None:
-        print(Fore.RED + "Failed to authenticate with Google Drive. Exiting.")
+        logging.error("Failed to authenticate with Google Drive. Exiting.")
         return
 
     # Step 1: Count total items to copy

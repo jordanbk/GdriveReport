@@ -2,6 +2,10 @@ from gdrive.auth import authenticate_gdrive
 from gdrive.utils import count_files_and_folders
 from googleapiclient.discovery import Resource
 from colorama import Fore, Style, init
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.WARNING)
 
 # Initialize colorama
 init(autoreset=True)
@@ -19,14 +23,14 @@ def count_files(source_folder_id: str) -> None:
 
     # Check if authentication failed, and exit if it did
     if service is None:
-        print(Fore.RED + "Failed to authenticate with Google Drive. Exiting.")
+        logging.error("Failed to authenticate with Google Drive. Exiting.")
         return
     
     try:
         # Count the number of files and folders at the root of the source folder
         file_count, folder_count = count_files_and_folders(service, source_folder_id)
     except Exception as e:
-        print(Fore.RED + f"Error while counting files and folders: {e}")
+        logging.error(f"Error while counting files and folders: {e}")
         return
     
     # Output the total number of files and folders at the root level
