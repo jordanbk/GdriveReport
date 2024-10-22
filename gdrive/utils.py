@@ -262,7 +262,7 @@ def get_rainbow_bar_format(step: int) -> str:
     colors = [Fore.RED, Fore.YELLOW, Fore.GREEN, Fore.CYAN, Fore.BLUE, Fore.MAGENTA]
     # Cycle through colors based on the step
     color = colors[step % len(colors)]
-    return "{l_bar}%s{bar}%s{r_bar}" % (color, Style.RESET_ALL)
+    return f"{'{l_bar}'}{color}{'{bar}'}{Style.RESET_ALL}{'{r_bar}'}"
 
 # https://patorjk.com/software/taag/#p=display&c=bash&f=Slant&t=GdriveReport
 def print_welcome() -> None:
