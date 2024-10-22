@@ -13,15 +13,10 @@ class GDriveReportingTool:
         """
         self.assessment_number = None
 
-    def get_assessment_choice(self):
+    def show_assessment_options(self):
         """
-        Prompts the user to select which assessment to run.
-
-        Returns:
-            int: The chosen assessment number.
+        Shows the assessment options to the user.
         """
-        print_welcome()
-        print(Back.BLACK + Fore.CYAN + "Welcome to the Google Drive Reporting Tool!")
         print(Fore.YELLOW + "\nPlease choose which assessment to run:")
         print(
             Fore.GREEN
@@ -43,6 +38,13 @@ class GDriveReportingTool:
         )
         print(Fore.GREEN + "(4) " + Fore.RED + "Exit")
 
+    def get_assessment_choice(self):
+        """
+        Prompts the user to select which assessment to run.
+
+        Returns:
+            int: The chosen assessment number.
+        """
         while True:
             try:
                 self.assessment_number = int(
@@ -92,9 +94,13 @@ class GDriveReportingTool:
         """
         Executes the chosen assessment based on the user's input.
         """
-        # Show the welcome screen and get the first assessment choice
+        # Show the welcome screen only once, before the loop
+        print_welcome()
+        print(Back.BLACK + Fore.CYAN + "Welcome to the Google Drive Reporting Tool!")
+
+        # Show the assessment options and get the first assessment choice
         while True:
-            # Get the user's assessment choice (welcome screen is shown here initially)
+            self.show_assessment_options()
             self.get_assessment_choice()
 
             # If the user chooses to exit, break the loop

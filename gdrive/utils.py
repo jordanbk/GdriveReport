@@ -136,7 +136,7 @@ def count_total_items(service: Resource, folder_id: str) -> int:
     """
     file_count, folder_count = count_files_and_folders(service, folder_id)
     total_items = file_count + folder_count
-    subfolders = [file for file in list_drive_files(service, folder_id) if file["mimeType"] == "application/vnd.google-apps.folder"]
+    subfolders = [file for file in list_drive_files(service, folder_id, 'files(id, mimeType)') if file["mimeType"] == "application/vnd.google-apps.folder"]
     
     for subfolder in subfolders:
         total_items += count_total_items(service, subfolder["id"])  # Recursively count subfolder items

@@ -1,4 +1,4 @@
-from gdrive.auth import authenticate_gdrive
+from gdrive.auth import GDriveAuth
 from gdrive.utils import count_files_and_folders
 from googleapiclient.discovery import Resource
 from colorama import Fore, Style, init
@@ -19,7 +19,7 @@ def count_files(source_folder_id: str) -> None:
         source_folder_id (str): The ID of the Google Drive folder to count files and folders in.
     """
     # Authenticate the Google Drive API and get a service instance
-    service: Resource = authenticate_gdrive()
+    service = GDriveAuth().get_service()
 
     # Check if authentication failed, and exit if it did
     if service is None:
@@ -53,5 +53,9 @@ if __name__ == "__main__":
     # Prompt for user input
     source_folder_id: str = input("Please enter the Google Drive folder ID: ").strip()
 
-    # Generate the file and folder count report for the source folder
-    count_files(source_folder_id)
+    if not source_folder_id:
+        logging.error("No folder ID provided. Exiting.")
+    else:
+        # Generate the file and folder count report for the source folder
+        count_files(source_folder_id)
+

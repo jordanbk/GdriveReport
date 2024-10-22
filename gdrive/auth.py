@@ -7,65 +7,80 @@ from googleapiclient.errors import HttpError
 from typing import Optional
 import logging
 
-# Configure logging
-logging.basicConfig(level=logging.WARNING)
+class GDriveAuth:
+    _instance = None
 
-# The scope we require for accessing Google Drive metadata
-SCOPES = ["https://www.googleapis.com/auth/drive"]
+    def __new__(cls):
+        """
+        Implementing the singleton pattern to ensure the same instance is used throughout the program.
+        """
+        if cls._instance is None:
+            cls._instance = super(GDriveAuth, cls).__new__(cls)
+        return cls._instance
 
+    def __init__(self, token_file: str = "token.json", credentials_file: str = "credentials.json"):
+        self.token_file = token_file
+        self.credentials_file = credentials_file
+        self.creds = None
+        self.service = None
+        self.scopes = ["https://www.googleapis.com/auth/drive"]
+        if not self.service:
+            self.authenticate_gdrive()
 
-def authenticate_gdrive() -> Optional[Resource]:
-    """
-    Authenticates the user to the Google Drive API using OAuth 2.0, returning a service instance
-    that can be used to interact with the Google Drive API.
-
-    The function checks for previously stored credentials in 'token.json'. If valid credentials
-    exist, they are used. If not, the user is prompted to authenticate via a browser, and the
-    new credentials are saved for future use.
-
-    Returns:
-        Optional[Resource]: A service instance to interact with the Google Drive API, or None if an error occurs.
-    """
-    # Initialize creds to None. This will hold the credentials if they are available.
-    creds: Optional[Credentials] = None
-    # Path to the credentials token file, which stores the OAuth 2.0 tokens for Google API access.
-    token_file = "token.json"
-
-    try:
-        # Step 1: Check if the 'token.json' file exists. This file stores credentials from previous sessions.
-        # If it exists, load the credentials from the file.
-        if os.path.exists(token_file):
-            creds = Credentials.from_authorized_user_file(token_file, SCOPES)
-            logging.info("Loaded credentials from token.json")
-    except HttpError as error:
-        logging.error(f"An error occurred while loading token file: {error}")
-        return None
-
-    # Step 2: If no valid credentials are found or they are expired, refresh them or start a new login flow.
-    if not creds or not creds.valid:
+    def authenticate_gdrive(self) -> Optional[Resource]:
+        """
+        Authenticates the user to the Google Drive API using OAuth 2.0, ensuring that the credentials
+        are loaded, refreshed, and saved if necessary, and builds the Google Drive service object.
+        
+        Returns:
+            Google Drive service object or None if an error occurs.
+        """
         try:
-            if creds and creds.expired and creds.refresh_token:
-                creds.refresh(Request())
-            else:
-                # If there's no valid credentials or refresh token, start the OAuth 2.0 login flow.
-                # This opens a local web server for the user to authenticate via their browser.
-                flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
-                creds = flow.run_local_server(port=0)
+            # Load credentials from token file
+            if os.path.exists(self.token_file):
+                self.creds = Credentials.from_authorized_user_file(self.token_file, self.scopes)
+                logging.info("Loaded credentials from token.json")
 
-            # Step 3: Save the new credentials to 'token.json' so they can be reused in future sessions.
-            with open(token_file, "w") as token:
-                token.write(creds.to_json())
+            # If credentials are invalid or expired, refresh or reauthenticate
+            if not self.creds or not self.creds.valid:
+                if self.creds and self.creds.expired and self.creds.refresh_token:
+                    self.creds.refresh(Request())
+                    logging.info("Refreshed expired credentials.")
+                else:
+                    # Start OAuth 2.0 flow if no valid credentials exist
+                    flow = InstalledAppFlow.from_client_secrets_file(self.credentials_file, self.scopes)
+                    self.creds = flow.run_local_server(port=0)
+                    logging.info("OAuth flow completed and credentials obtained.")
+
+                # Save the new or refreshed credentials
+                with open(self.token_file, "w") as token:
+                    token.write(self.creds.to_json())
+                    logging.info("New credentials saved to token.json.")
+
+            # Build and return the Google Drive service
+            self.service = build("drive", "v3", credentials=self.creds)
+            logging.info("Successfully authenticated and connected to Google Drive API.")
+            return self.service
 
         except (HttpError, Exception) as error:
-            logging.error(f"An error occurred during the OAuth flow or saving credentials: {error}")
+            logging.error(f"An error occurred during authentication: {error}")
             return None
 
-    try:
-        # Step 4: Use the credentials to build a Google Drive service object. This service object is used to
-        # interact with the Google Drive API.
-        service: Resource = build("drive", "v3", credentials=creds)
-        logging.info("Successfully authenticated and connected to Google Drive API.")
-        return service
-    except (HttpError, Exception) as error:
-        logging.error(f"An error occurred while connecting to the Google Drive API: {error}")
-        return None
+    def ensure_valid_credentials(self):
+        """
+        Checks if the credentials are valid before making any API call. Refreshes the credentials if needed.
+        """
+        if self.creds and self.creds.expired and self.creds.refresh_token:
+            self.creds.refresh(Request())
+            with open(self.token_file, "w") as token:
+                token.write(self.creds.to_json())
+            logging.info("Credentials were automatically refreshed.")
+        elif not self.creds or not self.creds.valid:
+            logging.error("Credentials are not valid. Re-authentication may be required.")
+
+    def get_service(self) -> Optional[Resource]:
+        """
+        Returns the authenticated Google Drive service object. Ensures that credentials are valid.
+        """
+        self.ensure_valid_credentials()
+        return self.service

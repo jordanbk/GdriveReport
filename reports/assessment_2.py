@@ -1,6 +1,6 @@
 from typing import Tuple, Optional
 from googleapiclient.discovery import Resource
-from gdrive.auth import authenticate_gdrive
+from gdrive.auth import GDriveAuth
 from gdrive.utils import count_children_recursively
 from colorama import Fore, Style, init
 import logging
@@ -22,7 +22,7 @@ def count_recursive(source_folder_id: str) -> None:
     """
 
     # Authenticate the Google Drive API and get a service instance
-    service: Optional[Resource] = authenticate_gdrive()
+    service = GDriveAuth().get_service()
 
     # Check if authentication failed, and exit if it did
     if service is None:
@@ -50,5 +50,8 @@ if __name__ == "__main__":
     # Prompt for user input
     source_folder_id: str = input("Please enter the Google Drive folder ID: ").strip()
 
-    # Generate the recursive count report
-    count_recursive(source_folder_id)
+    if not source_folder_id:
+        logging.error("No folder ID provided. Exiting.")
+    else:
+        # Generate the recursive count report
+        count_recursive(source_folder_id)

@@ -1,6 +1,6 @@
 from typing import List, Dict, Any, Optional
 from googleapiclient.discovery import Resource
-from gdrive.auth import authenticate_gdrive
+from gdrive.auth import GDriveAuth
 from gdrive.utils import (
     count_total_items,
     list_drive_files,
@@ -30,7 +30,7 @@ def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> N
     """
 
     # Authenticate the Google Drive API and get a service instance
-    service: Optional[Resource] = authenticate_gdrive()
+    service = GDriveAuth().get_service()
 
     # Check if authentication failed, and exit if it did
     if service is None:
@@ -102,4 +102,7 @@ if __name__ == "__main__":
     source_folder_id: str = input("Please enter the source folder ID: ").strip()
     destination_folder_id: str = input("\nPlease enter the destination folder ID: ").strip()
 
-    copy_folder_contents(source_folder_id, destination_folder_id)
+    if not source_folder_id or not destination_folder_id:
+        logging.error("Source and/or destination folder ID is missing. Exiting.")
+    else:
+        copy_folder_contents(source_folder_id, destination_folder_id)
