@@ -1,7 +1,7 @@
 from typing import Tuple, Optional
 from googleapiclient.discovery import Resource
 from gdrive.auth import authenticate_gdrive
-from gdrive.utils import count_files_and_folders, list_drive_files
+from gdrive.utils import count_children_recursively
 from colorama import Fore, Style, init
 
 # Initialize colorama
@@ -22,95 +22,29 @@ def count_recursive(source_folder_id: str) -> None:
 
     # Check if authentication failed, and exit if it did
     if service is None:
-        print("Failed to authenticate with Google Drive. Exiting.")
+        print(Fore.RED + "Failed to authenticate with Google Drive. Exiting.")
         return
-
-    def count_children(
-        folder_id: str, folder_name: str, level: int = 0
-    ) -> Tuple[int, int]:
-        """
-        Recursively count all files and folders in a given folder, including any nested subfolders.
-        Prints a tree structure for visualization.
-
-        Args:
-            folder_id (str): The ID of the folder for which files and folders are to be counted.
-            folder_name (str): The name of the current folder.
-            level (int): Current depth level for printing the tree structure.
-
-        Returns:
-            tuple: A tuple containing two elements:
-                - file_count (int): Total number of files in the folder and its subfolders.
-                - nested_folder_count (int): Total number of folders (including subfolders) within the folder.
-        """
-        # Get the initial file and folder counts for the current folder
-        file_count, folder_count = count_files_and_folders(service, folder_id)
-
-        # Print the current folder (with indentation based on the level)
-        print(
-            "    " * level
-            + f"📂 {folder_name} (ID: {folder_id}, Folders: {folder_count}, Files: {file_count})"
-        )
-
-        # Track the total number of nested folders
-        nested_folder_count = folder_count
-
-        # Retrieve all files and folders in the current source folder
-        files = list_drive_files(service, folder_id, "files(id, mimeType, name, webViewLink)")
-
-        # Filter out subfolders and files
-        subfolders = [
-            f for f in files if f["mimeType"] == "application/vnd.google-apps.folder"
-        ]
-        files = [
-            f for f in files if f["mimeType"] != "application/vnd.google-apps.folder"
-        ]
-
-        # Print files with indentation based on the level
-        for file in files:
-            file_url = file.get("webViewLink", "No URL available")
-            print("    " * (level + 1) + f"📄 {file['name']} (ID: {file['id']}) - \033]8;;{file_url}\033\\webViewLink\033]8;;\033\\")
-
-        # Recursively count files and folders inside each subfolder
-        for folder in subfolders:
-            sub_file_count, sub_folder_count = count_children(
-                folder["id"], folder["name"], level + 1
-            )
-            file_count += sub_file_count
-            nested_folder_count += sub_folder_count
-
-        return file_count, nested_folder_count
 
     # Get the name of the root folder using the Google Drive API
     response = service.files().get(fileId=source_folder_id, fields="name").execute()
-    root_folder_name = response.get(
-        "name", "Root Folder"
-    )  # Fallback to "Root Folder" if name not found
+    root_folder_name = response.get("name", "Root Folder")  # Fallback to "Root Folder" if name not found
 
     # Start the recursive counting for the source folder
-    total_files, total_folders = count_children(source_folder_id, root_folder_name)
+    total_files, total_folders = count_children_recursively(service, source_folder_id, root_folder_name)
 
     # Output the results
     print(Fore.YELLOW + "\n-----------------------------------------")
-    print(
-        f"\n{Fore.GREEN}Total number of child objects (recursively) across all top-level folders: {Fore.WHITE}{total_files}"
-    )
-    print(
-        f"\n{Fore.GREEN}Total number of nested folders within the source folder: {Fore.WHITE}{total_folders}"
-    )
-    print(
-        f"\n{Fore.GREEN}Total items (files + folders, excluding root folder): {Fore.WHITE}{total_files + total_folders}"
-    )
+    print(f"\n{Fore.GREEN}Total number of child objects (recursively) across all top-level folders: {Fore.WHITE}{total_files}")
+    print(f"\n{Fore.GREEN}Total number of nested folders within the source folder: {Fore.WHITE}{total_folders}")
+    print(f"\n{Fore.GREEN}Total items (files + folders, excluding root folder): {Fore.WHITE}{total_files + total_folders}")
     print(Fore.YELLOW + "\n-----------------------------------------")
-
 
 if __name__ == "__main__":
     """
     Main execution block: Calls the function to generate the report for the specified source folder.
     """
-    # Define the source folder ID (hardcoded for this example)
-    source_folder_id = (
-        "1n1bWgY26PZWXJnA3G5qfaD96kCupuUAK"  # Replace with your foldear ID
-    )
+    # Prompt for user input
+    source_folder_id: str = input("Please enter the Google Drive folder ID: ").strip()
 
     # Generate the recursive count report
     count_recursive(source_folder_id)

@@ -19,12 +19,16 @@ def count_files(source_folder_id: str) -> None:
 
     # Check if authentication failed, and exit if it did
     if service is None:
-        print("Failed to authenticate with Google Drive. Exiting.")
+        print(Fore.RED + "Failed to authenticate with Google Drive. Exiting.")
         return
-
-    # Count the number of files and folders at the root of the source folder
-    file_count, folder_count = count_files_and_folders(service, source_folder_id)
-
+    
+    try:
+        # Count the number of files and folders at the root of the source folder
+        file_count, folder_count = count_files_and_folders(service, source_folder_id)
+    except Exception as e:
+        print(Fore.RED + f"Error while counting files and folders: {e}")
+        return
+    
     # Output the total number of files and folders at the root level
     print(Fore.YELLOW + "\n-----------------------------------------")
     print(
@@ -42,10 +46,8 @@ if __name__ == "__main__":
     """
     Main execution block: Calls the function to generate the report for the specified source folder.
     """
-    # Define the source folder ID (hardcoded for this example)
-    source_folder_id: str = (
-        "1cpo-7jgKSMdde-QrEJGkGxN1QvYdzP9V"  # Replace with your folder ID
-    )
+    # Prompt for user input
+    source_folder_id: str = input("Please enter the Google Drive folder ID: ").strip()
 
     # Generate the file and folder count report for the source folder
     count_files(source_folder_id)
