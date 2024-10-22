@@ -66,21 +66,8 @@ class GDriveAuth:
             logging.error(f"An error occurred during authentication: {error}")
             return None
 
-    def ensure_valid_credentials(self):
-        """
-        Checks if the credentials are valid before making any API call. Refreshes the credentials if needed.
-        """
-        if self.creds and self.creds.expired and self.creds.refresh_token:
-            self.creds.refresh(Request())
-            with open(self.token_file, "w") as token:
-                token.write(self.creds.to_json())
-            logging.info("Credentials were automatically refreshed.")
-        elif not self.creds or not self.creds.valid:
-            logging.error("Credentials are not valid. Re-authentication may be required.")
-
     def get_service(self) -> Optional[Resource]:
         """
         Returns the authenticated Google Drive service object. Ensures that credentials are valid.
         """
-        self.ensure_valid_credentials()
         return self.service

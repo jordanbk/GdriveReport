@@ -1,5 +1,4 @@
-from typing import List, Dict, Any, Optional
-from googleapiclient.discovery import Resource
+from typing import Dict, Any, Optional
 from gdrive.auth import GDriveAuth
 from gdrive.utils import (
     count_total_items,

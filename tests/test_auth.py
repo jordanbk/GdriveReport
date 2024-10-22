@@ -8,29 +8,29 @@ import os
 
 class TestAuthenticateGDrive(unittest.TestCase):
 
-    @patch('gdrive.auth.build')  # Mock the build function from googleapiclient.discovery
-    @patch('gdrive.auth.Credentials.from_authorized_user_file')  # Mock loading credentials from file
-    def test_authenticate_with_existing_token(self, mock_from_authorized_user_file, mock_build):
-        """Test if the authentication works when valid credentials already exist."""
-        
-        # Create a mock credential object
+    @patch('gdrive.auth.build')
+    @patch('gdrive.auth.Credentials.from_authorized_user_file')
+    @patch("builtins.open", unittest.mock.mock_open())  # Mock file operations
+    def test_authenticate_with_expired_token(self, mock_from_authorized_user_file, mock_build):
         mock_creds = MagicMock(spec=Credentials)
-        mock_creds.valid = True  # Simulate valid credentials
+        mock_creds.valid = False  # Simulate invalid (expired) token
+        mock_creds.expired = True
+        mock_creds.refresh_token = "refresh_token_value"
         
-        # Mock the return value of from_authorized_user_file to simulate existing token
+        # Mock the refresh behavior
         mock_from_authorized_user_file.return_value = mock_creds
-        
-        # Mock the build function to simulate successful service creation
-        mock_service = MagicMock()
-        mock_build.return_value = mock_service
         
         # Call the function under test
         service = GDriveAuth().get_service()
         
         # Assertions
-        self.assertEqual(service, mock_service)  # Ensure the service is returned
-        mock_from_authorized_user_file.assert_called_once_with('token.json', ['https://www.googleapis.com/auth/drive'])
+        mock_creds.refresh.assert_called_once()  # Ensure refresh was triggered
         mock_build.assert_called_once_with('drive', 'v3', credentials=mock_creds)
+
+    def test_singleton_behavior(self):
+        auth1 = GDriveAuth()
+        auth2 = GDriveAuth()
+        self.assertIs(auth1, auth2)  # Ensure both variables point to the same instance
 
     @patch('gdrive.auth.os.path.exists', return_value=False)  # Simulate no token.json file
     @patch('gdrive.auth.InstalledAppFlow.from_client_secrets_file')  # Mock the OAuth flow creation
@@ -47,7 +47,7 @@ class TestAuthenticateGDrive(unittest.TestCase):
         mock_flow.run_local_server.return_value = mock_creds
         
         # Mock creds.to_json() to return a valid JSON string
-        mock_creds.to_json.return_value = '{"token": "fake_token"}'
+        mock_creds.to_json.return_value = '{"mock": "credentials"}'
         
         # Mock the build function to simulate successful service creation
         mock_service = MagicMock()

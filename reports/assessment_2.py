@@ -1,8 +1,6 @@
-from typing import Tuple, Optional
-from googleapiclient.discovery import Resource
 from gdrive.auth import GDriveAuth
 from gdrive.utils import count_children_recursively
-from colorama import Fore, Style, init
+from colorama import Fore, init
 import logging
 
 # Configure logging

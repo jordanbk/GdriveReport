@@ -1,6 +1,5 @@
 from gdrive.auth import GDriveAuth
 from gdrive.utils import count_files_and_folders
-from googleapiclient.discovery import Resource
 from colorama import Fore, Style, init
 import logging
 
