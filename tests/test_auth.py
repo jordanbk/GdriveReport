@@ -3,11 +3,8 @@ from unittest.mock import patch, MagicMock
 from googleapiclient.errors import HttpError
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
-from gdrive.auth import authenticate_gdrive
+from gdrive.auth import GDriveAuth
 import os
-
-from gdrive.auth import authenticate_gdrive  # Assuming your function is located in gdrive.auth
-
 
 class TestAuthenticateGDrive(unittest.TestCase):
 
@@ -28,7 +25,7 @@ class TestAuthenticateGDrive(unittest.TestCase):
         mock_build.return_value = mock_service
         
         # Call the function under test
-        service = authenticate_gdrive()
+        service = GDriveAuth().get_service()
         
         # Assertions
         self.assertEqual(service, mock_service)  # Ensure the service is returned
@@ -57,7 +54,7 @@ class TestAuthenticateGDrive(unittest.TestCase):
         mock_build.return_value = mock_service
         
         # Call the function under test
-        service = authenticate_gdrive()
+        service = GDriveAuth().get_service()
         
         # Assertions
         self.assertEqual(service, mock_service)  # Ensure the service is returned
@@ -80,7 +77,7 @@ class TestAuthenticateGDrive(unittest.TestCase):
         mock_from_authorized_user_file.side_effect = HttpError(mock_response, b'some error', uri='http://mock.url')
 
         # Call the function under test, expecting None as a result due to the error
-        service = authenticate_gdrive()
+        service = GDriveAuth().get_service()
 
         # Assertions
         self.assertIsNone(service)  # Ensure the function returns None due to the HttpError

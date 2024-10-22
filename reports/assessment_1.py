@@ -35,14 +35,8 @@ def count_files(source_folder_id: str) -> None:
     
     # Output the total number of files and folders at the root level
     print(Fore.YELLOW + "\n-----------------------------------------")
-    print(
-        Fore.CYAN
-        + f"\n{Fore.GREEN}Total files at the root of the source folder: {Fore.WHITE}{file_count}"
-    )
-    print(
-        Fore.CYAN
-        + f"\n{Fore.GREEN}Total folders at the root of the source folder: {Fore.WHITE}{folder_count}"
-    )
+    print(Fore.CYAN + f"\n{Fore.GREEN}Total files at the root of the source folder: {Fore.WHITE}{file_count}")
+    print(Fore.CYAN + f"\n{Fore.GREEN}Total folders at the root of the source folder: {Fore.WHITE}{folder_count}")
     print(Fore.YELLOW + "\n-----------------------------------------")
 
 
