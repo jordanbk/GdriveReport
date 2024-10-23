@@ -133,7 +133,6 @@ class GDriveReportingTool:
                     assessment_3.copy_folder_contents(folder_id, destination_folder_id)
 
             # After the assessment finishes, ask the user if they want to run another assessment
-            print("\nReport complete!")
             another = input("\nWould you like to run another assessment? (yes/no): ").lower()
 
             if another != "yes":

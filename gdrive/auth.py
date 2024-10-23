@@ -7,6 +7,12 @@ from googleapiclient.errors import HttpError
 from typing import Optional
 import logging
 
+# Configure logging to output to file
+log_file = "gdrive_log.log"
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(levelname)s - %(message)s', 
+                    handlers=[logging.FileHandler(log_file)])
+
 class GDriveAuth:
     _instance = None
 

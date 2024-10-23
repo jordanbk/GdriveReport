@@ -7,7 +7,7 @@
 - Choose Desktop App as the application type and click Create.
 - Use the download button to download your client secret.
 - Visit [Google API page](https://console.developers.google.com/apis/library)
-- Search for "Google Drive API" and enable it if it is disabled
+- Search for "Google Drive API" and enable it if it is disabled.
 
 #### Clone Repo and Run Reports
 - Clone the repo:

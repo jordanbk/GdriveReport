@@ -1,13 +1,11 @@
 from googleapiclient.discovery import Resource
+from googleapiclient.errors import HttpError
 from typing import Tuple, Callable, List, Dict, Any
 from colorama import Fore, Style
 import time
 import random
 from functools import wraps
 import logging
-
-# Configure logging
-logging.basicConfig(level=logging.WARNING)
 
 def exponential_backoff_retry(retries: int = 5) -> Callable[..., Any]:
     """
@@ -118,17 +116,37 @@ def count_files_and_folders(service: Resource, folder_id: str) -> Tuple[int, int
         tuple: A tuple containing two integers:
             - file_count (int): The number of files in the folder.
             - folder_count (int): The number of folders in the folder.
+    
+    Raises:
+        ValueError: If the folder ID is invalid or not accessible.
+        Exception: For other general errors.
     """
-    files = list_drive_files(service, folder_id, "files(id, mimeType)")
+    try:
+        # Attempt to list files in the folder using the Drive API
+        files = list_drive_files(service, folder_id, "files(id, mimeType)")
+
+        if not files:
+            logging.warning(f"No files found in folder with ID: {folder_id}")
+        
+        file_count = sum(
+            1 for file in files if file["mimeType"] != "application/vnd.google-apps.folder"
+        )
+        folder_count = sum(
+            1 for file in files if file["mimeType"] == "application/vnd.google-apps.folder"
+        )
+
+        logging.info(f"Counted {file_count} files and {folder_count} folders in folder ID: {folder_id}")
+        return file_count, folder_count
+
+    except HttpError as e:
+        # Catch HTTP-related errors from Google API
+        logging.error(f"An HTTP error occurred: {e}")
+        raise ValueError(f"Failed to access folder with ID {folder_id}. Please check the folder ID and try again.") from e
     
-    file_count = sum(
-        1 for file in files if file["mimeType"] != "application/vnd.google-apps.folder"
-    )
-    folder_count = sum(
-        1 for file in files if file["mimeType"] == "application/vnd.google-apps.folder"
-    )
-    
-    return file_count, folder_count
+    except Exception as e:
+        # Catch any other general exceptions
+        logging.error(f"An error occurred while counting files and folders: {e}")
+        raise Exception(f"An unexpected error occurred: {e}") from e
 
 def count_total_items(service: Resource, folder_id: str) -> int:
     """
