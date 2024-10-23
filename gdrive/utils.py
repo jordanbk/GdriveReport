@@ -144,7 +144,7 @@ def count_total_items(service: Resource, folder_id: str) -> int:
 
 def get_folder_contents(service: Resource, folder_id: str) -> List[Dict[str, Any]]:
     """
-    Retrieve all non-trashed files and folders in a folder, including subfolders.
+    Retrieves all non-trashed files and folders directly located in the specified Google Drive folder.
 
     Args:
         service (Resource): The Google Drive API service instance.

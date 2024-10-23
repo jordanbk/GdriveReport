@@ -87,7 +87,7 @@ def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> N
     # Check if the source and destination folders are identical
     print(f"\nRunning test to ensure parity...")
 
-    # Use the compare_folders function to check if the folders are identical
+    # Use function to check if the folders are identical
     if are_folders_identical(service, source_folder_id, destination_folder_id):
         print("\nThe folders are identical after copying.")
     else:
