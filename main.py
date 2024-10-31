@@ -1,4 +1,4 @@
-from reports import assessment_1, assessment_2, assessment_3
+from reports import copy_files, count_recursive, count_source
 from colorama import Fore, Back, init
 from gdrive.utils import print_welcome
 
@@ -112,12 +112,12 @@ class GDriveReportingTool:
             if self.assessment_number == 1:
                 folder_id = self.get_folder_id()
                 print(Fore.YELLOW + "\nRunning Assessment 1...")
-                assessment_1.count_files(folder_id)
+                count_source.count_files(folder_id)
 
             elif self.assessment_number == 2:
                 folder_id = self.get_folder_id()
                 print(Fore.YELLOW + "\nRunning Assessment 2...")
-                assessment_2.count_recursive(folder_id)
+                count_recursive.count_recursive(folder_id)
 
             elif self.assessment_number == 3:
                 folder_id = self.get_source_folder_id()  # Get source folder ID
@@ -130,7 +130,7 @@ class GDriveReportingTool:
                 else:
                     print(Fore.YELLOW + "\nRunning Assessment 3...")
                     # Proceed with copying if the IDs are different
-                    assessment_3.copy_folder_contents(folder_id, destination_folder_id)
+                    copy_files.copy_folder_contents(folder_id, destination_folder_id)
 
             # After the assessment finishes, ask the user if they want to run another assessment
             another = input("\nWould you like to run another assessment? (yes/no): ").lower()

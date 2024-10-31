@@ -35,15 +35,17 @@ def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> N
         return
 
     try:
-        # Step 1: Count total items to copy
+        # Step 1: Count total items to copy for tracking and user feedback
         print("\nCounting total items to copy...")
         total_items: int = count_total_items(service, source_folder_id)
         print(f"\nTotal items to copy: {total_items}")
 
+        # Initialize a counter to track the total items copied so far
         total_items_copied: int = 0
 
-        # Recursive function to copy files and subfolders
+        # Recursive function to copy files and subfolders within the specified source folder
         def recursively_copy_contents(source_id: str, dest_id: str) -> None:
+            # Allow the nested function to modify the total_items_copied
             nonlocal total_items_copied
 
             # Retrieve all files and folders in the current source folder
@@ -51,28 +53,31 @@ def copy_folder_contents(source_folder_id: str, destination_folder_id: str) -> N
 
             # Iterate over each file or folder in the current folder
             for file in files:
+                # Initialize copied_file as either a dictionary (to store file metadata) or None 
                 copied_file: Optional[Dict[str, Any]] = None
 
                 try:
-                    # If the current item is a folder, create the folder in the destination
+                    # If the current item is a folder, create the corresponding folder in the destination
                     if file["mimeType"] == "application/vnd.google-apps.folder":
                         copied_file = create_folder_with_retry(service, file, dest_id)
 
-                        # Recursively copy the subfolder contents
+                        # Recursively copy the subfolder contents by calling this function again
                         recursively_copy_contents(file["id"], copied_file["id"])
                     else:
                         # If the current item is a file, copy the file to the destination folder
                         copy_file_with_retry(service, file, dest_id)
 
-                    # Increment and update progress
+                    # Increment the count of copied items and update the progress bar display
                     total_items_copied += 1
                     progress_bar.bar_format = get_rainbow_bar_format(total_items_copied)
                     progress_bar.update(1)  # Update the progress bar by one unit
 
                 except HttpError as he:
+                    # Handle specific HTTP errors, likely due to permission or network issues that disrupt copying
                     logging.error(f"An HTTP error occurred while copying {file['name']}: {he}")
                     print(Fore.RED + f"\nError: Failed to copy {file['name']}. Please check your permissions or folder ID.")
                 except Exception as e:
+                    # Catch any other unexpected errors during copying
                     logging.error(f"An unexpected error occurred while copying {file['name']}: {e}")
                     print(Fore.RED + f"\nAn unexpected error occurred while copying {file['name']}.")
 

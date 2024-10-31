@@ -13,8 +13,12 @@ def exponential_backoff_retry(retries: int = 5) -> Callable[..., Any]:
     
     The wrapped function will attempt to execute, and if it raises an exception, 
     it will retry after a delay that increases exponentially with each attempt.
+    2 ** attempt plus a random jitter of up to 1 second.
+    Spreading out requests over time to avoid overwhelming the server.
+    Jitter introduces randomness, staggering retry times slightly to prevent retry collision,
+    so clients are less likely to all hit the server simultaneously.
     This continues until the function succeeds or the maximum number of retries is reached.
-    
+    min: 1, max 17
     Args:
         retries (int): The maximum number of retry attempts before raising an exception. 
                        Defaults to 5 retries.
@@ -77,12 +81,16 @@ def count_children_recursively(service: Resource, folder_id: str, folder_name: s
         tuple: A tuple containing two elements:
             - file_count (int): Total number of files in the folder and its subfolders.
             - nested_folder_count (int): Total number of folders (including subfolders) within the folder.
+    Enhancement: 
+            Avoid iterating through both files and subfolders separately.
+            Instead, iterate through files just once, incrementing file_count or folder_count based on each item's mimeType.
     """
     file_count, folder_count = count_files_and_folders(service, folder_id)
 
     # Print the current folder (with indentation based on the level)
     print("    " * level + f"📂 {folder_name} (ID: {folder_id}, Folders: {folder_count}, Files: {file_count})")
 
+    # Initialize the nested_folder_count variable with the count of folders directly within the current folder
     nested_folder_count = folder_count
     files = list_drive_files(service, folder_id, "files(id, mimeType, name, webViewLink)")
 
@@ -120,6 +128,10 @@ def count_files_and_folders(service: Resource, folder_id: str) -> Tuple[int, int
     Raises:
         ValueError: If the folder ID is invalid or not accessible.
         Exception: For other general errors.
+
+    Enhancement: 
+        Avoid iterating through both files and subfolders separately.
+        Instead, iterate through files just once, incrementing file_count or folder_count based on each item's mimeType.
     """
     try:
         # Attempt to list files in the folder using the Drive API
@@ -152,10 +164,17 @@ def count_total_items(service: Resource, folder_id: str) -> int:
     """
     Recursively count all files and subfolders in a Google Drive folder.
     """
+    # Returns a count of files and folders directly within the specified folder
     file_count, folder_count = count_files_and_folders(service, folder_id)
+
+    # Initialized with the sum of file_count and folder_count
     total_items = file_count + folder_count
+
+    # Retrieves a list of all folders within the current folder
     subfolders = [file for file in list_drive_files(service, folder_id, 'files(id, mimeType)') if file["mimeType"] == "application/vnd.google-apps.folder"]
     
+    # For each subfolder, the function recursively calls count_total_items, passing in the subfolder’s ID
+    # to count all items within that subfolder
     for subfolder in subfolders:
         total_items += count_total_items(service, subfolder["id"])  # Recursively count subfolder items
     return total_items
@@ -176,7 +195,7 @@ def get_folder_contents(service: Resource, folder_id: str) -> List[Dict[str, Any
 def create_folder_with_retry(service: Resource, file: Dict[str, Any], dest_id: str) -> Dict[str, Any]:
     """
     Helper function to create a folder with exponential backoff retry logic.
-
+    Folders in Google Drive cannot be copied directly; instead, a new folder needs to be created in the destination.
     Args:
         service (Resource): Google Drive API service instance.
         file (dict): The file/folder metadata.
@@ -190,6 +209,7 @@ def create_folder_with_retry(service: Resource, file: Dict[str, Any], dest_id: s
         "mimeType": "application/vnd.google-apps.folder",
         "parents": [dest_id],
     }
+    # API call to create a new folder with the specified metadata in the destination directory
     request = service.files().create(body=folder_metadata, fields="id")
     return execute_with_retry(request)
 
@@ -206,6 +226,7 @@ def copy_file_with_retry(service: Resource, file: Dict[str, Any], dest_id: str) 
         dict: Metadata of the copied file.
     """
     file_metadata = {"name": file["name"], "parents": [dest_id]}
+    # The file ID (file["id"]) is passed to copy, indicating the file to be duplicated
     request = service.files().copy(fileId=file["id"], body=file_metadata)
     return execute_with_retry(request)
 

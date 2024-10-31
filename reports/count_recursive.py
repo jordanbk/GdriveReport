@@ -27,6 +27,7 @@ def count_recursive(source_folder_id: str) -> None:
     try:
         # Get the name of the root folder using the Google Drive API
         response = service.files().get(fileId=source_folder_id, fields="name").execute()
+        # Only the name field should be returned
         root_folder_name = response.get("name", "Root Folder")  # Fallback to "Root Folder" if name not found
 
         # Start the recursive counting for the source folder

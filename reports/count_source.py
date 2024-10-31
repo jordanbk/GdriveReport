@@ -24,6 +24,7 @@ def count_files(source_folder_id: str) -> None:
     
     try:
         # Count the number of files and folders at the root of the source folder
+        # Unpacks the tuple returned by count_files_and_folders
         file_count, folder_count = count_files_and_folders(service, source_folder_id)
         
         # Only print the report if the counting succeeded
@@ -34,12 +35,10 @@ def count_files(source_folder_id: str) -> None:
 
     except ValueError as ve:
         # Handle known errors (invalid folder ID)
-        logging.error(ve)
         print(f"Error: {ve}")
     
     except Exception as e:
         # Handle unknown errors
-        logging.error(e)
         print(f"An unexpected error occurred: {e}")
 
 if __name__ == "__main__":
